@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -10,10 +11,17 @@ import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
 import 'package:summa/core/widgets/circular_button.dart';
+import 'package:summa/data/repository/shopping_list_repository_impl.dart';
 import 'package:summa/features/lists/list_page.dart';
+import 'package:summa/features/lists/shopping_list_viewmodel.dart';
 
 void main() {
-  runApp(const SummaApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ShoppingListViewmodel(ShoppingListRepositoryImpl()),
+      child: const SummaApp(),
+    ),
+  );
 }
 
 class SummaApp extends StatelessWidget {

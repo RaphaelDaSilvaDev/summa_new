@@ -11,11 +11,13 @@ class InputTextComponent extends StatelessWidget {
     this.onClear,
     this.hasClear = false,
     this.label,
+    this.onChanged,
   });
 
   final String? label;
   final TextEditingController? controller;
   final VoidCallback? onClear;
+  final Function(String)? onChanged;
   final bool hasClear;
 
   @override
@@ -31,6 +33,7 @@ class InputTextComponent extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
           ],
           TextField(
+            onChanged: onChanged,
             controller: controller,
             style: AppTextStyles.button,
             decoration: InputDecoration(

@@ -1,4 +1,4 @@
-package com.example.summa
+package com.omna.summa
 
 import io.flutter.embedding.android.FlutterActivity
 
