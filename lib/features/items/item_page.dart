@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
+import 'package:summa/core/widgets/Input/date_picker.dart';
+import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
 import 'package:summa/core/widgets/circular_button.dart';
+import 'package:summa/core/widgets/tag_component.dart';
 import 'package:summa/domain/model/shopping_item.dart';
+import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/features/items/component/item_card.dart';
 import 'package:summa/features/items/shopping_item_viewmodel.dart';
+import 'package:summa/features/lists/shopping_list_viewmodel.dart';
 
 class ItemPage extends StatefulWidget {
   const ItemPage({super.key, required this.listId});
@@ -20,8 +26,11 @@ class ItemPage extends StatefulWidget {
 }
 
 class _ItemPageState extends State<ItemPage> {
+  late TextEditingController _listNameController;
   late TextEditingController _itemNameController;
   late TextEditingController _quantityController;
+  late FocusNode _listNameFocusNode;
+  ShoppingList? _list;
   String _unitController = 'un';
 
   void _createItem() async {
@@ -37,18 +46,69 @@ class _ItemPageState extends State<ItemPage> {
     }
   }
 
+  void _getList() async {
+    final getList = await context.read<ShoppingListViewmodel>().getList(
+      widget.listId,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _list = getList;
+      _listNameController.text = _list?.name ?? "";
+    });
+  }
+
+  void _showEditDate() async {
+    final DateTime? pickedDate = await DatePicker.show(
+      context,
+      initialDate: _list?.plannedAt ?? DateTime.now(),
+    );
+
+    if (pickedDate != null && mounted && _list != null) {
+      await context.read<ShoppingListViewmodel>().update(
+        listId: _list!.id,
+        plannedAt: pickedDate,
+      );
+      _getList();
+    }
+  }
+
+  void _saveName() async {
+    final newName = _listNameController.text.trim();
+    final oldName = _list?.name;
+
+    if (newName.isNotEmpty && newName != oldName && _list != null) {
+      await context.read<ShoppingListViewmodel>().update(
+        listId: _list!.id,
+        name: newName,
+      );
+      _getList();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
+    _listNameController = TextEditingController();
     _itemNameController = TextEditingController();
     _quantityController = TextEditingController();
+    _listNameFocusNode = FocusNode();
+    _getList();
+
+    _listNameFocusNode.addListener(() {
+      if (!_listNameFocusNode.hasFocus) {
+        _saveName();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _listNameController.dispose();
     _itemNameController.dispose();
     _quantityController.dispose();
+    _listNameFocusNode.dispose();
     super.dispose();
   }
 
@@ -67,13 +127,36 @@ class _ItemPageState extends State<ItemPage> {
                   width: double.infinity,
                   height: 150,
                   padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    60,
+                    AppSpacing.sm,
+                    0,
                     AppSpacing.lg,
                     0,
                   ),
                   decoration: BoxDecoration(color: AppColors.gray900),
-                  child: Text('Compra do mês'),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          context.pop();
+                        },
+                        icon: Icon(Icons.chevron_left_sharp),
+                      ),
+                      Flexible(
+                        child: FlatInputTextComponent(
+                          controller: _listNameController,
+                          isBig: true,
+                          focusNode: _listNameFocusNode,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _showEditDate,
+                        child: TagComponent(
+                          text: _list?.formatDateDayMonth ?? "Adicionar data",
+                          color: AppColors.green,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 Positioned(

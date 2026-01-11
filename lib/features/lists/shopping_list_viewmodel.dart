@@ -55,4 +55,8 @@ class ShoppingListViewmodel extends ChangeNotifier {
   Future<void> remove(int listId) async {
     await repository.delete(listId);
   }
+
+  Future<ShoppingList?> getList(int listId) async {
+    return await repository.getListById(listId);
+  }
 }

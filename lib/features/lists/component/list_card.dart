@@ -38,6 +38,14 @@ class _ListCardComponentState extends State<ListCardComponent> {
   }
 
   @override
+  void didUpdateWidget(covariant ListCardComponent oldWidget) {
+    if (widget.listWithItem.list.name != oldWidget.listWithItem.list.name) {
+      _controller.text = widget.listWithItem.list.name;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
