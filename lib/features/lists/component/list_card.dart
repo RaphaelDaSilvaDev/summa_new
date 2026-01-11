@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
@@ -113,83 +114,86 @@ class _ListCardComponentState extends State<ListCardComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.xs,
-        AppSpacing.md,
-        AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.gray400,
-        border: Border.all(width: 2, color: AppColors.gray300),
-        borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
-      ),
-      child: Column(
-        spacing: AppRadius.sm,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: FlatInputTextComponent(
-                  controller: _controller,
-                  isBig: true,
-                  focusNode: _focusNode,
-                ),
-              ),
-              SizedBox(
-                width: 24,
-                child: PopupMenuButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
+    return GestureDetector(
+      onTap: () => context.push('/item/${widget.listWithItem.list.id}'),
+      child: Container(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.xs,
+          AppSpacing.md,
+          AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.gray400,
+          border: Border.all(width: 2, color: AppColors.gray300),
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
+        ),
+        child: Column(
+          spacing: AppRadius.sm,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: FlatInputTextComponent(
+                    controller: _controller,
+                    isBig: true,
+                    focusNode: _focusNode,
                   ),
-                  icon: Icon(Icons.more_vert, color: AppColors.gray100),
-                  color: AppColors.gray400,
-                  onSelected: (value) => _menuSelect(value),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'remove',
-                      child: Text('Remover', style: AppTextStyles.button),
+                ),
+                SizedBox(
+                  width: 24,
+                  child: PopupMenuButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    icon: Icon(Icons.more_vert, color: AppColors.gray100),
+                    color: AppColors.gray400,
+                    onSelected: (value) => _menuSelect(value),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'remove',
+                        child: Text('Remover', style: AppTextStyles.button),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Text("Total: ", style: AppTextStyles.body),
+                    Text(
+                      "R\$ ${widget.listWithItem.totalPrice}",
+                      style: AppTextStyles.headline1.copyWith(
+                        fontSize: 18,
+                        color: AppColors.green,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Text("Total: ", style: AppTextStyles.body),
-                  Text(
-                    "R\$ ${widget.listWithItem.totalPrice}",
-                    style: AppTextStyles.headline1.copyWith(
-                      fontSize: 18,
-                      color: AppColors.green,
-                    ),
-                  ),
-                ],
-              ),
-              TagComponent(
-                text:
-                    "${widget.listWithItem.totalIsDone}/${widget.listWithItem.items.length}",
-                color: AppColors.blue,
-              ),
-              GestureDetector(
-                onTap: _showEditDate,
-                child: TagComponent(
-                  text: widget.listWithItem.list.formatDateDayMonth,
-                  color: AppColors.green,
+                TagComponent(
+                  text:
+                      "${widget.listWithItem.totalIsDone}/${widget.listWithItem.items.length}",
+                  color: AppColors.blue,
                 ),
-              ),
-            ],
-          ),
-        ],
+                GestureDetector(
+                  onTap: _showEditDate,
+                  child: TagComponent(
+                    text: widget.listWithItem.list.formatDateDayMonth,
+                    color: AppColors.green,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

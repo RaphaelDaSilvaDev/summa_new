@@ -32,8 +32,8 @@ class ShoppingListViewmodel extends ChangeNotifier {
         .toList();
   }
 
-  Future<void> createList(String name, DateTime? date) async {
-    await repository.insert(ShoppingList(name: name, plannedAt: date));
+  Future<int> createList(String name, DateTime? date) async {
+    return await repository.insert(ShoppingList(name: name, plannedAt: date));
   }
 
   Future<void> update({

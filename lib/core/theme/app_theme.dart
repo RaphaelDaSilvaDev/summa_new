@@ -10,9 +10,15 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: AppColors.purple),
+      brightness: Brightness.dark,
+      primaryColor: AppColors.gray900,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.purple,
+        brightness: Brightness.dark,
+      ),
       textTheme: textTheme,
       scaffoldBackgroundColor: AppColors.gray500,
+      canvasColor: AppColors.gray500,
     );
   }
 }

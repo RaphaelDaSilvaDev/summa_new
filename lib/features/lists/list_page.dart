@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -40,8 +41,16 @@ class _ListPageState extends State<ListPage> {
 
     if (result != null && mounted) {
       final (listName, date) = result;
-      context.read<ShoppingListViewmodel>().createList(listName, date);
+      final id = await context.read<ShoppingListViewmodel>().createList(
+        listName,
+        date,
+      );
+      _goToItemPage(id);
     }
+  }
+
+  void _goToItemPage(int pageId) {
+    context.push('/item/$pageId');
   }
 
   @override
