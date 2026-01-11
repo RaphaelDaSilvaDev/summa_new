@@ -16,7 +16,7 @@ class QuantityUnitField extends StatefulWidget {
   final String? label;
   final TextEditingController quantityController;
   final String unit;
-  final ValueChanged<String?> onUnitChanged;
+  final ValueChanged<String> onUnitChanged;
 
   @override
   State<QuantityUnitField> createState() => _QuantityUnitFieldState();
@@ -89,12 +89,12 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
 
               // Unidade
               DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
+                child: DropdownButton(
                   value: widget.unit,
                   icon: const Icon(Icons.keyboard_arrow_down),
                   style: AppTextStyles.button,
                   dropdownColor: AppColors.gray500,
-                  onChanged: widget.onUnitChanged,
+                  onChanged: (value) => widget.onUnitChanged(value ?? ""),
                   items: const [
                     DropdownMenuItem(value: 'un', child: Text('un')),
                     DropdownMenuItem(value: 'kg', child: Text('kg')),
