@@ -10,7 +10,6 @@ import 'package:summa/core/widgets/Input/check_box.dart';
 import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
-import 'package:summa/core/widgets/circular_button.dart';
 import 'package:summa/data/repository/shopping_list_repository_impl.dart';
 import 'package:summa/features/lists/list_page.dart';
 import 'package:summa/features/lists/shopping_list_viewmodel.dart';
@@ -39,10 +38,7 @@ class SummaApp extends StatelessWidget {
           statusBarIconBrightness: Brightness.light,
           statusBarBrightness: Brightness.dark,
         ),
-        child: Scaffold(
-          floatingActionButton: CircularButtonComponnent(),
-          body: ListPage(),
-        ),
+        child: ListPage(),
       ),
     );
   }

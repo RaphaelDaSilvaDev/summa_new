@@ -27,7 +27,7 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
       final itemsResult = await db.query(
         'shopping_items',
-        where: 'id = ?',
+        where: 'listId = ?',
         whereArgs: [list.id],
       );
 
@@ -68,7 +68,7 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
     if (result.isEmpty) return null;
 
-    return ShoppingListMapper.fromMap(result as Map<String, dynamic>);
+    return ShoppingListMapper.fromMap(result.first);
   }
 
   @override

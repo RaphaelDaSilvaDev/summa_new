@@ -12,6 +12,10 @@ class InputTextComponent extends StatelessWidget {
     this.hasClear = false,
     this.label,
     this.onChanged,
+    this.autoFocus = false,
+    this.readOnly = false,
+    this.onTap,
+    this.hintText,
   });
 
   final String? label;
@@ -19,6 +23,10 @@ class InputTextComponent extends StatelessWidget {
   final VoidCallback? onClear;
   final Function(String)? onChanged;
   final bool hasClear;
+  final bool autoFocus;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +43,9 @@ class InputTextComponent extends StatelessWidget {
           TextField(
             onChanged: onChanged,
             controller: controller,
+            autofocus: autoFocus,
+            readOnly: readOnly,
+            onTap: onTap,
             style: AppTextStyles.button,
             decoration: InputDecoration(
               filled: true,
@@ -47,7 +58,7 @@ class InputTextComponent extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
                 borderSide: BorderSide(color: AppColors.purple, width: 2),
               ),
-              hintText: 'Item',
+              hintText: hintText,
               suffixIcon: hasClear
                   ? IconButton(
                       icon: const Icon(Icons.close),

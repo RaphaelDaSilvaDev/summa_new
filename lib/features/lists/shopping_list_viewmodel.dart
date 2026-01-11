@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/domain/model/shopping_list_with_items.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
 
@@ -8,14 +9,12 @@ class ShoppingListViewmodel extends ChangeNotifier {
   late final Stream<List<ShoppingListWithItems>> listStream;
 
   ShoppingListViewmodel(this.repository) {
-    print("Instância do ViewModel criada: $hashCode");
     listStream = repository.getAll();
   }
 
   String _query = "";
 
   void updateSearch(String value) {
-    print(value);
     _query = value.trim().toLowerCase();
     notifyListeners();
   }
@@ -23,10 +22,7 @@ class ShoppingListViewmodel extends ChangeNotifier {
   Stream<List<ShoppingListWithItems>> get baseStream => listStream;
 
   List<ShoppingListWithItems> applyFilter(List<ShoppingListWithItems> lists) {
-    print(_query);
     if (_query.isEmpty) return lists;
-
-    print("search");
 
     return lists
         .where(
@@ -34,5 +30,29 @@ class ShoppingListViewmodel extends ChangeNotifier {
               listWithItem.list.name.toLowerCase().contains(_query),
         )
         .toList();
+  }
+
+  Future<void> createList(String name, DateTime? date) async {
+    await repository.insert(ShoppingList(name: name, plannedAt: date));
+  }
+
+  Future<void> update({
+    required int listId,
+    String? name,
+    DateTime? plannedAt,
+    bool? isActive,
+  }) async {
+    ShoppingList? list = await repository.getListById(listId);
+
+    if (list != null) {
+      list.plannedAt = plannedAt ?? list.plannedAt;
+      list.name = name ?? list.name;
+      list.isActive = isActive ?? list.isActive;
+      await repository.update(list);
+    }
+  }
+
+  Future<void> remove(int listId) async {
+    await repository.delete(listId);
   }
 }
