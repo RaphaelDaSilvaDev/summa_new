@@ -22,5 +22,10 @@ class AppTextStyles {
     color: AppColors.gray100,
   );
 
+  static final hintText = GoogleFonts.inter(
+    fontSize: 14,
+    color: AppColors.gray200,
+  );
+
   static final body = GoogleFonts.inter(fontSize: 12, color: AppColors.gray100);
 }

@@ -59,13 +59,13 @@ class _ItemPageState extends State<ItemPage> {
         children: [
           SizedBox(
             width: double.infinity,
-            height: 150,
+            height: 180,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 Container(
                   width: double.infinity,
-                  height: double.infinity,
+                  height: 150,
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg,
                     60,
@@ -84,7 +84,6 @@ class _ItemPageState extends State<ItemPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Expanded(
-                        flex: 3,
                         child: InputTextComponent(
                           controller: _itemNameController,
                           label: 'Item',
@@ -94,9 +93,10 @@ class _ItemPageState extends State<ItemPage> {
 
                       const SizedBox(width: 8),
 
-                      Expanded(
-                        flex: 2,
+                      SizedBox(
+                        width: 114,
                         child: QuantityUnitField(
+                          hintText: 'Qnt',
                           quantityController: _quantityController,
                           unit: _unitController,
                           onUnitChanged: (value) {
@@ -116,8 +116,6 @@ class _ItemPageState extends State<ItemPage> {
               ],
             ),
           ),
-
-          SizedBox(height: 40),
 
           Expanded(
             child: Consumer<ShoppingItemViewmodel>(

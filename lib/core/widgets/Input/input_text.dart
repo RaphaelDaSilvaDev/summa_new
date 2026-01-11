@@ -59,6 +59,7 @@ class InputTextComponent extends StatelessWidget {
                 borderSide: BorderSide(color: AppColors.purple, width: 2),
               ),
               hintText: hintText,
+              hintStyle: AppTextStyles.hintText,
               suffixIcon: hasClear
                   ? IconButton(
                       icon: const Icon(Icons.close),

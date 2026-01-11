@@ -96,7 +96,7 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
                     ),
                   ),
                   SizedBox(
-                    width: 120,
+                    width: 114,
                     child: InputTextComponent(
                       controller: _valueController,
                       onClear: () => _valueController.clear(),

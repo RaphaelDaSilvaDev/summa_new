@@ -63,13 +63,13 @@ class _ListPageState extends State<ListPage> {
         children: [
           SizedBox(
             width: double.infinity,
-            height: 150,
+            height: 180,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 Container(
                   width: double.infinity,
-                  height: double.infinity,
+                  height: 150,
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg,
                     60,
@@ -104,9 +104,6 @@ class _ListPageState extends State<ListPage> {
               ],
             ),
           ),
-
-          SizedBox(height: 40),
-
           Expanded(
             child: Consumer<ShoppingListViewmodel>(
               builder: (context, viewModel, _) {

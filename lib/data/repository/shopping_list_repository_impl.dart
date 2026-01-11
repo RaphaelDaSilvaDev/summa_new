@@ -123,4 +123,8 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
     await _emitLists();
   }
+
+  void refresh() {
+    _emitLists();
+  }
 }

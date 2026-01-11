@@ -11,12 +11,14 @@ class QuantityUnitField extends StatefulWidget {
     required this.unit,
     required this.onUnitChanged,
     this.label,
+    this.hintText,
   });
 
   final String? label;
   final TextEditingController quantityController;
   final String unit;
   final ValueChanged<String> onUnitChanged;
+  final String? hintText;
 
   @override
   State<QuantityUnitField> createState() => _QuantityUnitFieldState();
@@ -75,7 +77,11 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   style: AppTextStyles.button,
-                  decoration: const InputDecoration(border: InputBorder.none),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: widget.hintText,
+                    hintStyle: AppTextStyles.hintText,
+                  ),
                 ),
               ),
 
