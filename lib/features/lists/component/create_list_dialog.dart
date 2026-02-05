@@ -14,6 +14,7 @@ class CreateListDialog extends StatefulWidget {
 class _CreateListDialogState extends State<CreateListDialog> {
   final nameController = TextEditingController();
   final dateController = TextEditingController();
+  String? nameError;
   DateTime? lazyDate;
 
   void _showDatePicker() async {
@@ -52,6 +53,7 @@ class _CreateListDialogState extends State<CreateListDialog> {
             InputTextComponent(
               controller: nameController,
               label: 'Nome da lista',
+              errorText: nameError,
               hintText: 'Compra do mês',
               autoFocus: true,
             ),
@@ -78,7 +80,14 @@ class _CreateListDialogState extends State<CreateListDialog> {
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.purple),
           onPressed: () {
             if (nameController.text.isNotEmpty) {
+              setState(() {
+                nameError = null;
+              });
               Navigator.pop(context, (nameController.text, lazyDate));
+            } else {
+              setState(() {
+                nameError = "Campo Obrigatório";
+              });
             }
           },
           child: Text('Criar', style: AppTextStyles.body),

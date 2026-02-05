@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:summa/core/extensions/currency_extensions.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -52,15 +53,24 @@ class _ListCardComponentState extends State<ListCardComponent> {
     super.dispose();
   }
 
+  void _goToItemPage() {
+    context.push('/item/${widget.listWithItem.list.id}');
+    _focusNode.unfocus();
+  }
+
   void _saveName() {
     final newName = _controller.text.trim();
     final oldName = widget.listWithItem.list.name;
 
-    if (newName.isNotEmpty && newName != oldName) {
-      context.read<ShoppingListViewmodel>().update(
-        listId: widget.listWithItem.list.id,
-        name: newName,
-      );
+    if (newName.isNotEmpty) {
+      if (newName != oldName) {
+        context.read<ShoppingListViewmodel>().update(
+          listId: widget.listWithItem.list.id,
+          name: newName,
+        );
+      }
+    } else {
+      _controller.text = widget.listWithItem.list.name;
     }
   }
 
@@ -123,13 +133,13 @@ class _ListCardComponentState extends State<ListCardComponent> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/item/${widget.listWithItem.list.id}'),
+      onTap: () => _goToItemPage(),
       child: Container(
         padding: EdgeInsets.fromLTRB(
           AppSpacing.md,
-          AppSpacing.xs,
-          AppSpacing.md,
           AppSpacing.sm,
+          AppSpacing.md,
+          AppSpacing.md,
         ),
         decoration: BoxDecoration(
           color: AppColors.gray400,
@@ -137,7 +147,6 @@ class _ListCardComponentState extends State<ListCardComponent> {
           borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
         ),
         child: Column(
-          spacing: AppRadius.sm,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -178,7 +187,7 @@ class _ListCardComponentState extends State<ListCardComponent> {
                   children: [
                     Text("Total: ", style: AppTextStyles.body),
                     Text(
-                      "R\$ ${widget.listWithItem.totalPrice}",
+                      widget.listWithItem.totalPrice.formatCurrencyBR(),
                       style: AppTextStyles.headline1.copyWith(
                         fontSize: 18,
                         color: AppColors.green,

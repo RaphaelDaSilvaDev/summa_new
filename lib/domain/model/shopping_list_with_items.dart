@@ -7,7 +7,7 @@ class ShoppingListWithItems {
 
   ShoppingListWithItems({required this.list, required this.items});
 
-  double get totalPrice =>
+  int get totalPrice =>
       items.fold(0, (sum, item) => sum + item.totalPriceInCents);
 
   int get totalIsDone => items.where((item) => item.isDone).length;

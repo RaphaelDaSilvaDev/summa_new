@@ -6,12 +6,12 @@ class CheckboxComponent extends StatelessWidget {
   const CheckboxComponent({super.key, required this.value, this.onTap});
 
   final bool value;
-  final Function? onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => !value,
+      onTap: onTap,
       child: Container(
         width: 24,
         height: 24,

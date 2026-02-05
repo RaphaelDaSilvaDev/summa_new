@@ -1,10 +1,10 @@
 class ShoppingItem {
   final int id;
-  final String name;
-  final double quantity;
-  final String unit;
-  final int? unitPrice;
-  final bool isDone;
+  String name;
+  double quantity;
+  String unit;
+  int? unitPrice;
+  bool isDone;
 
   ShoppingItem({
     this.id = 0,

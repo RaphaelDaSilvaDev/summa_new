@@ -15,7 +15,22 @@ class ShoppingItemViewmodel extends ChangeNotifier {
     itemStream = repository.getAllByList(listId);
   }
 
+  String _query = "";
+
+  void updateSearch(String value) {
+    _query = value.trim().toLowerCase();
+    notifyListeners();
+  }
+
   Stream<List<ShoppingItem>> get baseStream => itemStream;
+
+  List<ShoppingItem> applyFilter(List<ShoppingItem> listItems) {
+    if (_query.isEmpty) return listItems;
+
+    return listItems
+        .where((item) => item.name.toLowerCase().contains(_query))
+        .toList();
+  }
 
   Future<void> create({
     required String name,
@@ -29,6 +44,31 @@ class ShoppingItemViewmodel extends ChangeNotifier {
 
     if (listRepository is ShoppingListRepositoryImpl) {
       (listRepository as ShoppingListRepositoryImpl).refresh();
+    }
+  }
+
+  Future<void> update({
+    required int itemId,
+    String? name,
+    double? quantity,
+    String? unit,
+    int? unitPrice,
+    bool? isDone,
+  }) async {
+    ShoppingItem? item = await repository.getItemById(itemId);
+
+    if (item != null) {
+      item.name = name ?? item.name;
+      item.quantity = quantity ?? item.quantity;
+      item.unit = unit ?? item.unit;
+      item.unitPrice = unitPrice ?? item.unitPrice;
+      item.isDone = isDone ?? item.isDone;
+
+      await repository.update(item, listId);
+
+      if (listRepository is ShoppingListRepositoryImpl) {
+        (listRepository as ShoppingListRepositoryImpl).refresh();
+      }
     }
   }
 }

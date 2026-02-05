@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -16,6 +17,11 @@ class InputTextComponent extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.hintText,
+    this.focusNode,
+    this.inputFormatters,
+    this.textInputType,
+    this.onSubmitted,
+    this.errorText,
   });
 
   final String? label;
@@ -27,6 +33,11 @@ class InputTextComponent extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final String? hintText;
+  final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextInputType? textInputType;
+  final Function(String)? onSubmitted;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -46,17 +57,31 @@ class InputTextComponent extends StatelessWidget {
             autofocus: autoFocus,
             readOnly: readOnly,
             onTap: onTap,
+            focusNode: focusNode,
+            keyboardType: textInputType,
             style: AppTextStyles.button,
+            inputFormatters: inputFormatters,
+            onSubmitted: onSubmitted,
             decoration: InputDecoration(
               filled: true,
               fillColor: AppColors.gray500,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
-                borderSide: BorderSide(color: AppColors.gray300, width: 2),
+                borderSide: BorderSide(
+                  color: errorText?.isNotEmpty == true
+                      ? AppColors.red
+                      : AppColors.gray300,
+                  width: 2,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
-                borderSide: BorderSide(color: AppColors.purple, width: 2),
+                borderSide: BorderSide(
+                  color: errorText?.isNotEmpty == true
+                      ? AppColors.red
+                      : AppColors.purple,
+                  width: 2,
+                ),
               ),
               hintText: hintText,
               hintStyle: AppTextStyles.hintText,

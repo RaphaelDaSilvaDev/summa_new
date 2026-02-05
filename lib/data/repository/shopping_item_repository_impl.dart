@@ -46,7 +46,7 @@ class ShoppingItemRepositoryImpl implements ShoppingItemRepository {
     final db = await DatabaseProvider.database;
 
     final result = await db.query(
-      'shopping_item',
+      'shopping_items',
       where: 'id = ?',
       whereArgs: [id],
       limit: 1,

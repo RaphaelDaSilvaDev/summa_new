@@ -12,38 +12,34 @@ class QuantityUnitField extends StatefulWidget {
     required this.onUnitChanged,
     this.label,
     this.hintText,
+    this.focusNode,
+    this.onSubmitted,
   });
 
   final String? label;
   final TextEditingController quantityController;
   final String unit;
-  final ValueChanged<String> onUnitChanged;
+  final void Function(String value) onUnitChanged;
   final String? hintText;
+  final FocusNode? focusNode;
+  final Function(String)? onSubmitted;
 
   @override
   State<QuantityUnitField> createState() => _QuantityUnitFieldState();
 }
 
 class _QuantityUnitFieldState extends State<QuantityUnitField> {
-  late FocusNode _focusNode;
   bool _hasFocus = false;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
 
-    _focusNode.addListener(() {
+    widget.focusNode?.addListener(() {
       setState(() {
-        _hasFocus = _focusNode.hasFocus;
+        _hasFocus = widget.focusNode?.hasFocus ?? false;
       });
     });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
   }
 
   @override
@@ -72,11 +68,12 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
               SizedBox(
                 width: 30,
                 child: TextField(
-                  focusNode: _focusNode,
+                  focusNode: widget.focusNode,
                   controller: widget.quantityController,
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.button,
+                  onSubmitted: widget.onSubmitted,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: widget.hintText,
@@ -100,7 +97,7 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
                   icon: const Icon(Icons.keyboard_arrow_down),
                   style: AppTextStyles.button,
                   dropdownColor: AppColors.gray500,
-                  onChanged: (value) => widget.onUnitChanged(value ?? ""),
+                  onChanged: (value) => widget.onUnitChanged(value!),
                   items: const [
                     DropdownMenuItem(value: 'un', child: Text('un')),
                     DropdownMenuItem(value: 'kg', child: Text('kg')),

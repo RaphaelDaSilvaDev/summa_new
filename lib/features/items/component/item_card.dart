@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:summa/core/extensions/currency_extensions.dart';
+import 'package:summa/core/extensions/quantity_exteinsions.dart';
+import 'package:summa/core/input_formatters/currency_input_formatter.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -8,11 +13,17 @@ import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
 import 'package:summa/domain/model/shopping_item.dart';
+import 'package:summa/features/items/shopping_item_viewmodel.dart';
 
 class ItemCardComponent extends StatefulWidget {
-  const ItemCardComponent({super.key, required this.item});
+  const ItemCardComponent({
+    super.key,
+    required this.item,
+    required this.listId,
+  });
 
   final ShoppingItem item;
+  final int listId;
 
   @override
   State<ItemCardComponent> createState() => _ItemCardComponentState();
@@ -20,21 +31,122 @@ class ItemCardComponent extends StatefulWidget {
 
 class _ItemCardComponentState extends State<ItemCardComponent> {
   late TextEditingController _quantityController;
+  late FocusNode _quantityFocusNode;
   late TextEditingController _valueController;
+  late FocusNode _valueFocusNode;
   late TextEditingController _nameItemController;
+  late FocusNode _nameItemFocusNode;
+
+  late int _unitTotalInCents;
+  late int _subTotalInCents;
+  late double _quantity;
 
   @override
   void initState() {
+    _unitTotalInCents = widget.item.unitPrice ?? 0;
+    _quantity = widget.item.quantity;
+    _subTotalInCents = (_unitTotalInCents * _quantity).round();
+
     _quantityController = TextEditingController(
-      text: widget.item.quantity.toString(),
+      text: _quantity.formatQuantity(),
     );
+    _quantityController.addListener(_recalculateSubtotal);
+    _quantityFocusNode = FocusNode();
+    _quantityFocusNode.addListener(() {
+      if (_quantityFocusNode.hasFocus) {
+        _quantityController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _quantityController.text.length,
+        );
+      }
+
+      if (!_quantityFocusNode.hasFocus) {
+        final rawText = _quantityController.text.trim();
+
+        if (rawText.isEmpty) return;
+
+        final parsedValue = double.tryParse(rawText.replaceAll(",", "."));
+
+        if (parsedValue == null) return;
+
+        context.read<ShoppingItemViewmodel>().update(
+          itemId: widget.item.id,
+          quantity: parsedValue,
+        );
+
+        _quantityController.text = parsedValue.formatQuantity();
+      }
+    });
+
     _valueController = TextEditingController(
-      text: widget.item.unitPrice != null
-          ? widget.item.unitPrice.toString()
-          : "",
+      text: _unitTotalInCents.formatCurrencyBR(),
     );
+    _valueController.addListener(_recalculateSubtotal);
+    _valueFocusNode = FocusNode();
+    _valueFocusNode.addListener(() {
+      if (_valueFocusNode.hasFocus) {
+        _valueController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _valueController.text.length,
+        );
+      }
+
+      if (!_valueFocusNode.hasFocus) {
+        final cents = _valueController.text.parseCurrencyBRToCents();
+        context.read<ShoppingItemViewmodel>().update(
+          itemId: widget.item.id,
+          unitPrice: cents,
+        );
+
+        _valueController.text = cents.formatCurrencyBR();
+      }
+    });
+
     _nameItemController = TextEditingController(text: widget.item.name);
+    _nameItemFocusNode = FocusNode();
+    _nameItemFocusNode.addListener(() {
+      if (!_nameItemFocusNode.hasFocus) {
+        if (_nameItemController.text.isNotEmpty) {
+          context.read<ShoppingItemViewmodel>().update(
+            itemId: widget.item.id,
+            name: _nameItemController.text.trim(),
+          );
+        } else {
+          _nameItemController.text = widget.item.name;
+        }
+      }
+    });
     super.initState();
+  }
+
+  void _recalculateSubtotal() {
+    final cents = _valueController.text.parseCurrencyBRToCents();
+    final quantity = _quantityController.text.formatStringToQuanity();
+    setState(() {
+      _unitTotalInCents = cents;
+      _quantity = quantity;
+      _subTotalInCents = (cents * quantity).round();
+    });
+
+    context.read<ShoppingItemViewmodel>().update(
+      itemId: widget.item.id,
+      unitPrice: cents,
+      quantity: quantity,
+    );
+  }
+
+  void updateStatus() {
+    context.read<ShoppingItemViewmodel>().update(
+      itemId: widget.item.id,
+      isDone: !widget.item.isDone,
+    );
+  }
+
+  void updateUnit(String value) {
+    context.read<ShoppingItemViewmodel>().update(
+      itemId: widget.item.id,
+      unit: value,
+    );
   }
 
   @override
@@ -57,12 +169,13 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CheckboxComponent(value: widget.item.isDone),
+              CheckboxComponent(value: widget.item.isDone, onTap: updateStatus),
               SizedBox(width: 8),
               Expanded(
                 child: FlatInputTextComponent(
                   controller: _nameItemController,
                   isBig: true,
+                  focusNode: _nameItemFocusNode,
                 ),
               ),
               Icon(Icons.more_vert, color: AppColors.gray100),
@@ -76,8 +189,9 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
                   SizedBox(
                     width: 114,
                     child: QuantityUnitField(
-                      onUnitChanged: (value) {},
+                      onUnitChanged: (value) => updateUnit(value),
                       quantityController: _quantityController,
+                      focusNode: _quantityFocusNode,
                       unit: widget.item.unit,
                     ),
                   ),
@@ -87,7 +201,7 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
                       style: AppTextStyles.body,
                       children: [
                         TextSpan(
-                          text: 'R\$${widget.item.totalPriceInCents}',
+                          text: _subTotalInCents.formatCurrencyBR(),
                           style: AppTextStyles.headline2.copyWith(
                             color: AppColors.green,
                           ),
@@ -99,8 +213,14 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
                     width: 114,
                     child: InputTextComponent(
                       controller: _valueController,
+                      focusNode: _valueFocusNode,
+                      textInputType: TextInputType.number,
                       onClear: () => _valueController.clear(),
                       hintText: "R\$ 0,00",
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CurrencyInputFormatter(),
+                      ],
                     ),
                   ),
                 ],
