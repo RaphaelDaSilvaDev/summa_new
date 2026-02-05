@@ -21,8 +21,10 @@ void main() {
         ),
 
         ChangeNotifierProvider(
-          create: (context) =>
-              ShoppingListViewmodel(context.read<ShoppingListRepository>()),
+          create: (context) => ShoppingListViewmodel(
+            itemRepository: context.read<ShoppingItemRepository>(),
+            context.read<ShoppingListRepository>(),
+          ),
         ),
       ],
       child: const SummaApp(),

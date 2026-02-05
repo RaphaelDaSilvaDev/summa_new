@@ -36,15 +36,20 @@ class ShoppingItemViewmodel extends ChangeNotifier {
     required String name,
     required String unit,
     required double quantity,
+    int? newListId,
   }) async {
     await repository.insert(
       ShoppingItem(name: name, unit: unit, quantity: quantity),
-      listId,
+      newListId ?? listId,
     );
 
     if (listRepository is ShoppingListRepositoryImpl) {
       (listRepository as ShoppingListRepositoryImpl).refresh();
     }
+  }
+
+  Stream<List<ShoppingItem>> getAllByList(int listId) {
+    return repository.getAllByList(listId);
   }
 
   Future<void> update({

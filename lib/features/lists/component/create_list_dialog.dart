@@ -5,17 +5,38 @@ import 'package:summa/core/widgets/Input/date_picker.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 
 class CreateListDialog extends StatefulWidget {
-  const CreateListDialog({super.key});
+  const CreateListDialog({super.key, this.name, this.date});
 
+  final String? name;
+  final DateTime? date;
   @override
   State<CreateListDialog> createState() => _CreateListDialogState();
 }
 
 class _CreateListDialogState extends State<CreateListDialog> {
-  final nameController = TextEditingController();
-  final dateController = TextEditingController();
+  late TextEditingController nameController;
+  late TextEditingController dateController;
   String? nameError;
   DateTime? lazyDate;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    nameController = TextEditingController(text: widget.name ?? "");
+    dateController = TextEditingController(
+      text: widget.date != null
+          ? '${widget.date?.day.toString().padLeft(2, "0")}/${widget.date?.month.toString().padLeft(2, "0")}/${widget.date?.year}'
+          : "",
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    dateController.dispose();
+    super.dispose();
+  }
 
   void _showDatePicker() async {
     final DateTime? pickedDate = await DatePicker.show(
@@ -32,11 +53,19 @@ class _CreateListDialogState extends State<CreateListDialog> {
     }
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    dateController.dispose();
-    super.dispose();
+  void save() {
+    if (nameController.text.isNotEmpty) {
+      setState(() {
+        nameError = null;
+        isLoading = true;
+      });
+      Navigator.pop(context, (nameController.text, lazyDate));
+    } else {
+      setState(() {
+        nameError = "Campo Obrigatório";
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -70,7 +99,7 @@ class _CreateListDialogState extends State<CreateListDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => {Navigator.pop(context)},
           child: Text(
             'Cancelar',
             style: AppTextStyles.body.copyWith(color: AppColors.gray100),
@@ -78,19 +107,14 @@ class _CreateListDialogState extends State<CreateListDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.purple),
-          onPressed: () {
-            if (nameController.text.isNotEmpty) {
-              setState(() {
-                nameError = null;
-              });
-              Navigator.pop(context, (nameController.text, lazyDate));
-            } else {
-              setState(() {
-                nameError = "Campo Obrigatório";
-              });
-            }
-          },
-          child: Text('Criar', style: AppTextStyles.body),
+          onPressed: isLoading ? null : save,
+          child: isLoading
+              ? SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text('Criar', style: AppTextStyles.body),
         ),
       ],
     );

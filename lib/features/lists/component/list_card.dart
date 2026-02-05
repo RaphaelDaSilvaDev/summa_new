@@ -10,6 +10,7 @@ import 'package:summa/core/widgets/Input/date_picker.dart';
 import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/tag_component.dart';
 import 'package:summa/domain/model/shopping_list_with_items.dart';
+import 'package:summa/features/lists/component/create_list_dialog.dart';
 import 'package:summa/features/lists/shopping_list_viewmodel.dart';
 
 class ListCardComponent extends StatefulWidget {
@@ -53,8 +54,8 @@ class _ListCardComponentState extends State<ListCardComponent> {
     super.dispose();
   }
 
-  void _goToItemPage() {
-    context.push('/item/${widget.listWithItem.list.id}');
+  void _goToItemPage({int? id}) {
+    context.push('/item/${id ?? widget.listWithItem.list.id}');
     _focusNode.unfocus();
   }
 
@@ -88,8 +89,34 @@ class _ListCardComponentState extends State<ListCardComponent> {
     }
   }
 
+  void _showCreateListDialog() async {
+    final result = await showDialog<(String, DateTime?)>(
+      context: context,
+      builder: (context) => CreateListDialog(
+        name: widget.listWithItem.list.name,
+        date: widget.listWithItem.list.plannedAt,
+      ),
+    );
+
+    if (result != null && mounted) {
+      final (listName, date) = result;
+      final id = await context
+          .read<ShoppingListViewmodel>()
+          .duplicateListWithItems(
+            name: listName,
+            date: date,
+            items: widget.listWithItem.items,
+          );
+
+      _goToItemPage(id: id);
+    }
+  }
+
   void _menuSelect(String? selected) async {
     switch (selected) {
+      case 'duplicate':
+        _showCreateListDialog();
+        break;
       case 'remove':
         final confirm = await showDialog<bool>(
           context: context,
@@ -170,6 +197,10 @@ class _ListCardComponentState extends State<ListCardComponent> {
                     color: AppColors.gray400,
                     onSelected: (value) => _menuSelect(value),
                     itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'duplicate',
+                        child: Text('Duplicar', style: AppTextStyles.button),
+                      ),
                       PopupMenuItem(
                         value: 'remove',
                         child: Text('Remover', style: AppTextStyles.button),

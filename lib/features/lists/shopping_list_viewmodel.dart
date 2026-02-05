@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/domain/model/shopping_list_with_items.dart';
+import 'package:summa/domain/repositories/shopping_item_repository.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
 
 class ShoppingListViewmodel extends ChangeNotifier {
   final ShoppingListRepository repository;
+  final ShoppingItemRepository itemRepository;
 
   late final Stream<List<ShoppingListWithItems>> listStream;
 
-  ShoppingListViewmodel(this.repository) {
+  ShoppingListViewmodel(this.repository, {required this.itemRepository}) {
     listStream = repository.getAll();
   }
 
@@ -34,6 +37,25 @@ class ShoppingListViewmodel extends ChangeNotifier {
 
   Future<int> createList(String name, DateTime? date) async {
     return await repository.insert(ShoppingList(name: name, plannedAt: date));
+  }
+
+  Future<int> duplicateListWithItems({
+    required String name,
+    DateTime? date,
+    required List<ShoppingItem> items,
+  }) async {
+    final newListId = await createList(name, date);
+
+    for (final item in items) {
+      final ShoppingItem newItem = ShoppingItem(
+        name: item.name,
+        unit: item.unit,
+        quantity: item.quantity,
+      );
+      await itemRepository.insert(newItem, newListId);
+    }
+
+    return newListId;
   }
 
   Future<void> update({
