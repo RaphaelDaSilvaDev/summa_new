@@ -76,4 +76,11 @@ class ShoppingItemViewmodel extends ChangeNotifier {
       }
     }
   }
+
+  Future<void> remove(int itemId) async {
+    await repository.delete(itemId, listId);
+    if (listRepository is ShoppingListRepositoryImpl) {
+      (listRepository as ShoppingListRepositoryImpl).refresh();
+    }
+  }
 }

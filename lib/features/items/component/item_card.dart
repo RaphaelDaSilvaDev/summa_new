@@ -149,6 +149,47 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
     );
   }
 
+  void _menuSelected(String? selected) async {
+    switch (selected) {
+      case 'remove':
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: AppColors.gray400,
+            title: Text("Remover item?", style: AppTextStyles.headline2),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Text(
+                'Essa opção não pode ser desfeita.',
+                style: AppTextStyles.body,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(
+                  "Cancelar",
+                  style: AppTextStyles.body.copyWith(color: AppColors.gray100),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(
+                  "Remover",
+                  style: AppTextStyles.body.copyWith(color: AppColors.purple),
+                ),
+              ),
+            ],
+          ),
+        );
+
+        if (confirm == true && mounted) {
+          await context.read<ShoppingItemViewmodel>().remove(widget.item.id);
+        }
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -178,7 +219,25 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
                   focusNode: _nameItemFocusNode,
                 ),
               ),
-              Icon(Icons.more_vert, color: AppColors.gray100),
+              SizedBox(
+                width: 24,
+                child: PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  icon: Icon(Icons.more_vert, color: AppColors.gray100),
+                  color: AppColors.gray400,
+                  onSelected: (value) => _menuSelected(value),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'remove',
+                      child: Text("Remover", style: AppTextStyles.button),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           Column(
