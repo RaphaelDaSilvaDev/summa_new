@@ -13,7 +13,6 @@ import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
 import 'package:summa/core/widgets/circular_button.dart';
 import 'package:summa/core/widgets/tag_component.dart';
-import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/features/items/component/item_card.dart';
 import 'package:summa/features/items/shopping_item_viewmodel.dart';
@@ -117,8 +116,6 @@ class _ItemPageState extends State<ItemPage> {
     _itemNameFocusNode = FocusNode();
     _quantityFocusNode = FocusNode();
     _getList();
-
-    _itemNameFocusNode.requestFocus();
 
     _listNameFocusNode.addListener(() {
       if (!_listNameFocusNode.hasFocus) {
@@ -262,8 +259,8 @@ class _ItemPageState extends State<ItemPage> {
             Expanded(
               child: Consumer<ShoppingItemViewmodel>(
                 builder: (context, viewModel, child) {
-                  return StreamBuilder<List<ShoppingItem>>(
-                    stream: viewModel.baseStream,
+                  return StreamBuilder<ShoppingItemsUiState>(
+                    stream: context.read<ShoppingItemViewmodel>().uiState,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
@@ -277,9 +274,11 @@ class _ItemPageState extends State<ItemPage> {
                         return Text('Error: ${snapshot.error}');
                       }
 
-                      final listItems = snapshot.data ?? [];
+                      final state = snapshot.data!;
+                      final listItems = state.items;
 
                       if (listItems.isEmpty) {
+                        _itemNameFocusNode.requestFocus();
                         return Center(
                           child: Text(
                             'Nenhum item encontrado',
@@ -293,12 +292,12 @@ class _ItemPageState extends State<ItemPage> {
                         (sum, item) => sum + item.totalPriceInCents,
                       );
 
-                      final filtered = viewModel.applyFilter(listItems);
-
                       return Column(
                         children: [
                           Expanded(
-                            child: filtered.isEmpty
+                            child:
+                                _searchController.text.isEmpty &&
+                                    listItems.isEmpty
                                 ? Center(
                                     child: Text(
                                       'Nenhum item encontrado para o filtro',
@@ -312,7 +311,7 @@ class _ItemPageState extends State<ItemPage> {
                                       horizontal: AppSpacing.lg,
                                       vertical: AppSpacing.sm,
                                     ),
-                                    items: filtered,
+                                    items: listItems,
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
                                     areItemsTheSame: (oldItem, newItem) =>

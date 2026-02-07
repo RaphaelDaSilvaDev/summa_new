@@ -1,36 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/domain/model/shopping_list_with_items.dart';
 import 'package:summa/domain/repositories/shopping_item_repository.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
 
+class ShoppingListUiState {
+  final List<ShoppingListWithItems> items;
+
+  const ShoppingListUiState({required this.items});
+}
+
 class ShoppingListViewmodel extends ChangeNotifier {
   final ShoppingListRepository repository;
   final ShoppingItemRepository itemRepository;
 
-  late final Stream<List<ShoppingListWithItems>> listStream;
+  final _seachController = BehaviorSubject<String>.seeded('');
+
+  late final Stream<ShoppingListUiState> uiState;
 
   ShoppingListViewmodel(this.repository, {required this.itemRepository}) {
-    listStream = repository.getAll();
-  }
+    uiState =
+        Rx.combineLatest2<
+          List<ShoppingListWithItems>,
+          String,
+          ShoppingListUiState
+        >(repository.getAll(), _seachController.stream.startWith(''), (
+          items,
+          search,
+        ) {
+          final filtered = _applyFilter(items, search);
 
-  String _query = "";
+          return ShoppingListUiState(items: filtered);
+        });
+  }
 
   void updateSearch(String value) {
-    _query = value.trim().toLowerCase();
-    notifyListeners();
+    _seachController.add(value.trim().toLowerCase());
   }
 
-  Stream<List<ShoppingListWithItems>> get baseStream => listStream;
-
-  List<ShoppingListWithItems> applyFilter(List<ShoppingListWithItems> lists) {
-    if (_query.isEmpty) return lists;
+  List<ShoppingListWithItems> _applyFilter(
+    List<ShoppingListWithItems> lists,
+    String search,
+  ) {
+    if (search.isEmpty) return lists;
 
     return lists
         .where(
           (listWithItem) =>
-              listWithItem.list.name.toLowerCase().contains(_query),
+              listWithItem.list.name.toLowerCase().contains(search),
         )
         .toList();
   }
@@ -80,5 +99,11 @@ class ShoppingListViewmodel extends ChangeNotifier {
 
   Future<ShoppingList?> getList(int listId) async {
     return await repository.getListById(listId);
+  }
+
+  @override
+  void dispose() {
+    _seachController.close();
+    super.dispose();
   }
 }

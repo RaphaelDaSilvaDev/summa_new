@@ -1,34 +1,55 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:summa/data/repository/shopping_list_repository_impl.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/repositories/shopping_item_repository.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
+
+class ShoppingItemsUiState {
+  final List<ShoppingItem> items;
+  final int totalInCents;
+
+  const ShoppingItemsUiState({required this.items, required this.totalInCents});
+}
 
 class ShoppingItemViewmodel extends ChangeNotifier {
   final ShoppingItemRepository repository;
   final ShoppingListRepository listRepository;
   final int listId;
 
-  late final Stream<List<ShoppingItem>> itemStream;
+  final _searchController = BehaviorSubject<String>.seeded('');
+
+  late final Stream<ShoppingItemsUiState> uiState;
 
   ShoppingItemViewmodel(this.repository, this.listRepository, this.listId) {
-    itemStream = repository.getAllByList(listId);
-  }
+    uiState =
+        Rx.combineLatest2<List<ShoppingItem>, String, ShoppingItemsUiState>(
+          repository.getAllByList(listId),
+          _searchController.stream.startWith(''),
+          (items, search) {
+            final filtered = _applyFilter(items, search);
 
-  String _query = "";
+            final total = filtered.fold(
+              0,
+              (sum, item) => sum + item.totalPriceInCents,
+            );
+
+            return ShoppingItemsUiState(items: filtered, totalInCents: total);
+          },
+        );
+  }
 
   void updateSearch(String value) {
-    _query = value.trim().toLowerCase();
-    notifyListeners();
+    _searchController.add(value.trim().toLowerCase());
   }
 
-  Stream<List<ShoppingItem>> get baseStream => itemStream;
-
-  List<ShoppingItem> applyFilter(List<ShoppingItem> listItems) {
-    if (_query.isEmpty) return listItems;
+  List<ShoppingItem> _applyFilter(List<ShoppingItem> listItems, String search) {
+    if (search.isEmpty) return listItems;
 
     return listItems
-        .where((item) => item.name.toLowerCase().contains(_query))
+        .where((item) => item.name.toLowerCase().contains(search))
         .toList();
   }
 
@@ -43,9 +64,7 @@ class ShoppingItemViewmodel extends ChangeNotifier {
       newListId ?? listId,
     );
 
-    if (listRepository is ShoppingListRepositoryImpl) {
-      (listRepository as ShoppingListRepositoryImpl).refresh();
-    }
+    _refreshList();
   }
 
   Stream<List<ShoppingItem>> getAllByList(int listId) {
@@ -71,16 +90,24 @@ class ShoppingItemViewmodel extends ChangeNotifier {
 
       await repository.update(item, listId);
 
-      if (listRepository is ShoppingListRepositoryImpl) {
-        (listRepository as ShoppingListRepositoryImpl).refresh();
-      }
+      _refreshList();
     }
   }
 
   Future<void> remove(int itemId) async {
     await repository.delete(itemId, listId);
+    _refreshList();
+  }
+
+  void _refreshList() {
     if (listRepository is ShoppingListRepositoryImpl) {
       (listRepository as ShoppingListRepositoryImpl).refresh();
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.close();
+    super.dispose();
   }
 }
