@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reorderable_list_2.dart';
@@ -9,10 +11,12 @@ import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
 import 'package:summa/core/widgets/Input/date_picker.dart';
 import 'package:summa/core/widgets/Input/flat_input_text.dart';
+import 'package:summa/core/widgets/Input/input_autocomplete.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
 import 'package:summa/core/widgets/circular_button.dart';
 import 'package:summa/core/widgets/tag_component.dart';
+import 'package:summa/data/dto/item_suggestion_dto.dart';
 import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/features/items/component/item_card.dart';
 import 'package:summa/features/items/shopping_item_viewmodel.dart';
@@ -30,12 +34,14 @@ class ItemPage extends StatefulWidget {
 class _ItemPageState extends State<ItemPage> {
   late TextEditingController _listNameController;
   late TextEditingController _itemNameController;
-  String? _itemNameError;
   late TextEditingController _quantityController;
   late TextEditingController _searchController;
   late FocusNode _listNameFocusNode;
-  late FocusNode _itemNameFocusNode;
   late FocusNode _quantityFocusNode;
+  StreamSubscription<ShoppingItemsUiState>? _itemsSub;
+  String? _itemNameError;
+  FocusNode? _itemNameFocusNode;
+  bool _listIsEmpty = false;
 
   ShoppingList? _list;
   String _unitController = 'un';
@@ -53,6 +59,14 @@ class _ItemPageState extends State<ItemPage> {
 
       _itemNameController.clear();
       _quantityController.clear();
+
+      setState(() {
+        _unitController = 'un';
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _itemNameFocusNode?.requestFocus();
+      });
     } else {
       setState(() {
         _itemNameError = "Campo obrigatório";
@@ -105,15 +119,28 @@ class _ItemPageState extends State<ItemPage> {
     }
   }
 
+  Future<Iterable<ItemSuggestionDto>> _getSearchItem(String text) async {
+    return await context.read<ShoppingItemViewmodel>().getItemSearch(text);
+  }
+
+  void _onSelectSearchItem(ItemSuggestionDto item) {
+    _itemNameController.text = item.name;
+    setState(() {
+      _unitController = item.unit;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _quantityFocusNode.requestFocus();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _listNameController = TextEditingController();
-    _itemNameController = TextEditingController();
     _quantityController = TextEditingController();
     _searchController = TextEditingController();
     _listNameFocusNode = FocusNode();
-    _itemNameFocusNode = FocusNode();
     _quantityFocusNode = FocusNode();
     _getList();
 
@@ -122,16 +149,31 @@ class _ItemPageState extends State<ItemPage> {
         _saveName();
       }
     });
+
+    _itemsSub = context.read<ShoppingItemViewmodel>().uiState.listen((state) {
+      final isEmpty = state.items.isEmpty;
+      if (isEmpty && !_listIsEmpty) {
+        _itemNameFocusNode?.requestFocus();
+      }
+      _listIsEmpty = isEmpty;
+    });
+  }
+
+  void _removeAllFocus(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(FocusNode());
+    });
   }
 
   @override
   void dispose() {
+    _itemsSub?.cancel();
     _listNameController.dispose();
-    _itemNameController.dispose();
     _quantityController.dispose();
     _searchController.dispose();
     _listNameFocusNode.dispose();
-    _itemNameFocusNode.dispose();
     _quantityFocusNode.dispose();
     super.dispose();
   }
@@ -139,7 +181,7 @@ class _ItemPageState extends State<ItemPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () => _removeAllFocus(context),
       child: Scaffold(
         body: Column(
           children: [
@@ -193,13 +235,20 @@ class _ItemPageState extends State<ItemPage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Expanded(
-                          child: InputTextComponent(
-                            controller: _itemNameController,
-                            focusNode: _itemNameFocusNode,
+                          child: InputAutocomplete(
+                            onInputControllerCreated: (textController) {
+                              _itemNameController = textController;
+                            },
+                            onFocusNodeCreated: (focusNode) {
+                              _itemNameFocusNode = focusNode;
+                            },
                             errorText: _itemNameError,
                             onSubmitted: (_) {
                               _quantityFocusNode.requestFocus();
                             },
+                            onSelectedReturn: (item) =>
+                                _onSelectSearchItem(item),
+                            search: (value) => _getSearchItem(value),
                             label: 'Item',
                             hintText: 'Nome do item',
                           ),
@@ -278,7 +327,6 @@ class _ItemPageState extends State<ItemPage> {
                       final listItems = state.items;
 
                       if (listItems.isEmpty) {
-                        _itemNameFocusNode.requestFocus();
                         return Center(
                           child: Text(
                             'Nenhum item encontrado',

@@ -204,100 +204,95 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          AppSpacing.xs,
-          AppSpacing.md,
-          AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.gray400,
-          border: Border.all(width: 2, color: AppColors.gray300),
-          borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
-        ),
-        child: Column(
-          spacing: AppRadius.sm,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CheckboxComponent(
-                  value: widget.item.isDone,
-                  onTap: updateStatus,
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.gray400,
+        border: Border.all(width: 2, color: AppColors.gray300),
+        borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
+      ),
+      child: Column(
+        spacing: AppRadius.sm,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CheckboxComponent(value: widget.item.isDone, onTap: updateStatus),
+              SizedBox(width: 8),
+              Expanded(
+                child: FlatInputTextComponent(
+                  controller: _nameItemController,
+                  isBig: true,
+                  focusNode: _nameItemFocusNode,
                 ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: FlatInputTextComponent(
-                    controller: _nameItemController,
-                    isBig: true,
-                    focusNode: _nameItemFocusNode,
-                  ),
-                ),
-                SizedBox(
-                  width: 24,
-                  child: PopupMenuWidget(
-                    menuSelect: _menuSelected,
-                    menuItems: [
-                      PopupMenuItem(
-                        value: 'remove',
-                        child: Text("Remover", style: AppTextStyles.button),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 114,
-                      child: QuantityUnitField(
-                        hintText: 'Qnt',
-                        quantityController: _quantityController,
-                        focusNode: _quantityFocusNode,
-                        unit: widget.item.unit,
-                        onUnitChanged: (value) => updateUnit(value),
-                      ),
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        text: 'Total: ',
-                        style: AppTextStyles.body,
-                        children: [
-                          TextSpan(
-                            text: _subTotalInCents.formatCurrencyBR(),
-                            style: AppTextStyles.headline2.copyWith(
-                              color: AppColors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 114,
-                      child: InputTextComponent(
-                        controller: _valueController,
-                        focusNode: _valueFocusNode,
-                        textInputType: TextInputType.number,
-                        onClear: () => _valueController.clear(),
-                        hintText: "R\$ 0,00",
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          CurrencyInputFormatter(),
-                        ],
-                      ),
+              ),
+              SizedBox(
+                width: 24,
+                child: PopupMenuWidget(
+                  menuSelect: _menuSelected,
+                  menuItems: [
+                    PopupMenuItem(
+                      value: 'remove',
+                      child: Text("Remover", style: AppTextStyles.button),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: 114,
+                    child: QuantityUnitField(
+                      hintText: 'Qnt',
+                      quantityController: _quantityController,
+                      focusNode: _quantityFocusNode,
+                      unit: widget.item.unit,
+                      onUnitChanged: (value) => updateUnit(value),
+                    ),
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      text: 'Total: ',
+                      style: AppTextStyles.body,
+                      children: [
+                        TextSpan(
+                          text: _subTotalInCents.formatCurrencyBR(),
+                          style: AppTextStyles.headline2.copyWith(
+                            color: AppColors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 114,
+                    child: InputTextComponent(
+                      controller: _valueController,
+                      focusNode: _valueFocusNode,
+                      textInputType: TextInputType.number,
+                      onClear: () => _valueController.clear(),
+                      hintText: "R\$ 0,00",
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CurrencyInputFormatter(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

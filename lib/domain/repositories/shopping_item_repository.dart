@@ -1,3 +1,4 @@
+import 'package:summa/data/dto/item_suggestion_dto.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 
 abstract class ShoppingItemRepository {
@@ -10,4 +11,6 @@ abstract class ShoppingItemRepository {
   Future<void> delete(int id, int listId);
 
   Future<int> insert(ShoppingItem item, int listId);
+
+  Future<List<ItemSuggestionDto>> getItemsLikeName(String name);
 }

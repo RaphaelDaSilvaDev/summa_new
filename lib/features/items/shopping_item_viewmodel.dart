@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:summa/data/dto/item_suggestion_dto.dart';
 import 'package:summa/data/repository/shopping_list_repository_impl.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/repositories/shopping_item_repository.dart';
@@ -20,6 +21,7 @@ class ShoppingItemViewmodel extends ChangeNotifier {
   final int listId;
 
   final _searchController = BehaviorSubject<String>.seeded('');
+  final _searchItem = BehaviorSubject<String>.seeded('');
 
   late final Stream<ShoppingItemsUiState> uiState;
 
@@ -38,7 +40,7 @@ class ShoppingItemViewmodel extends ChangeNotifier {
 
             return ShoppingItemsUiState(items: filtered, totalInCents: total);
           },
-        );
+        ).asBroadcastStream();
   }
 
   void updateSearch(String value) {
@@ -99,6 +101,11 @@ class ShoppingItemViewmodel extends ChangeNotifier {
     _refreshList();
   }
 
+  Future<List<ItemSuggestionDto>> getItemSearch(String text) async {
+    if (text.isEmpty) return [];
+    return await repository.getItemsLikeName(text.trim());
+  }
+
   void _refreshList() {
     if (listRepository is ShoppingListRepositoryImpl) {
       (listRepository as ShoppingListRepositoryImpl).refresh();
@@ -108,6 +115,7 @@ class ShoppingItemViewmodel extends ChangeNotifier {
   @override
   void dispose() {
     _searchController.close();
+    _searchItem.close();
     super.dispose();
   }
 }

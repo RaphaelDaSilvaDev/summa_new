@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:summa/core/database/database_provider.dart';
+import 'package:summa/data/dto/item_suggestion_dto.dart';
 import 'package:summa/data/mapper/shopping_item_mapper.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/repositories/shopping_item_repository.dart';
@@ -83,5 +84,28 @@ class ShoppingItemRepositoryImpl implements ShoppingItemRepository {
     );
 
     await _emitLists(listId);
+  }
+
+  @override
+  Future<List<ItemSuggestionDto>> getItemsLikeName(String name) async {
+    final db = await DatabaseProvider.database;
+
+    final result = await db.query(
+      'shopping_items',
+      columns: ['name', 'unit'],
+      where: 'name LIKE ?',
+      whereArgs: ['%$name%'],
+      groupBy: 'name, unit',
+      limit: 10,
+    );
+
+    return result
+        .map(
+          (item) => ItemSuggestionDto(
+            name: item['name'] as String,
+            unit: item['unit'] as String,
+          ),
+        )
+        .toList();
   }
 }

@@ -23,8 +23,8 @@ class InputPopupMenuWidget extends StatelessWidget {
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(minWidth: 40),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-        side: BorderSide(width: 1, color: AppColors.gray300),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        side: BorderSide(width: 2, color: AppColors.gray300),
       ),
       icon: Row(
         children: [
