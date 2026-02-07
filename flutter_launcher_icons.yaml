@@ -1,0 +1,6 @@
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  adaptive_icon_background: "#7450AC" # Cor de fundo
+  adaptive_icon_foreground: "assets/images/logo_without_background.png"
