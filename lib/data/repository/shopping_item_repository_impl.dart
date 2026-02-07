@@ -14,6 +14,7 @@ class ShoppingItemRepositoryImpl implements ShoppingItemRepository {
     final itemResult = await db.query(
       'shopping_items',
       where: 'listId = ?',
+      orderBy: 'isDone, id',
       whereArgs: [listId],
     );
 

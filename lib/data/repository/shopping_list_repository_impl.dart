@@ -18,7 +18,7 @@ class ShoppingListRepositoryImpl implements ShoppingListRepository {
   Future<void> _emitLists() async {
     final db = await DatabaseProvider.database;
 
-    final listResult = await db.query('shopping_lists');
+    final listResult = await db.query('shopping_lists', orderBy: 'id DESC');
 
     final result = <ShoppingListWithItems>[];
 

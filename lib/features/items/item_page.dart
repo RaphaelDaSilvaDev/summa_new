@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reorderable_list_2.dart';
+import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/extensions/currency_extensions.dart';
 import 'package:summa/core/theme/app_colors.dart';
@@ -305,22 +307,34 @@ class _ItemPageState extends State<ItemPage> {
                                       ),
                                     ),
                                   )
-                                : ListView.separated(
+                                : ImplicitlyAnimatedList(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: AppSpacing.lg,
                                       vertical: AppSpacing.sm,
                                     ),
-                                    separatorBuilder: (_, _) =>
-                                        SizedBox(height: 12),
-                                    itemCount: filtered.length,
-                                    itemBuilder: (context, index) {
-                                      final item = filtered[index];
-                                      return ItemCardComponent(
-                                        key: ValueKey(item.id),
-                                        item: item,
-                                        listId: widget.listId,
-                                      );
-                                    },
+                                    items: filtered,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    areItemsTheSame: (oldItem, newItem) =>
+                                        oldItem.id == newItem.id,
+                                    itemBuilder:
+                                        (context, animation, item, index) {
+                                          return SizeFadeTransition(
+                                            sizeFraction: 0.5,
+                                            curve: Curves.easeInOut,
+                                            animation: animation,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 12,
+                                              ),
+                                              child: ItemCardComponent(
+                                                key: ValueKey(item.id),
+                                                item: item,
+                                                listId: widget.listId,
+                                              ),
+                                            ),
+                                          );
+                                        },
                                   ),
                           ),
                           Container(
