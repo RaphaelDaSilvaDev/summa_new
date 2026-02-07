@@ -8,6 +8,7 @@ import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
 import 'package:summa/core/widgets/Input/date_picker.dart';
 import 'package:summa/core/widgets/Input/flat_input_text.dart';
+import 'package:summa/core/widgets/popup_menu.dart';
 import 'package:summa/core/widgets/tag_component.dart';
 import 'package:summa/domain/model/shopping_list_with_items.dart';
 import 'package:summa/features/lists/component/create_list_dialog.dart';
@@ -187,16 +188,9 @@ class _ListCardComponentState extends State<ListCardComponent> {
                 ),
                 SizedBox(
                   width: 24,
-                  child: PopupMenuButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    icon: Icon(Icons.more_vert, color: AppColors.gray100),
-                    color: AppColors.gray400,
-                    onSelected: (value) => _menuSelect(value),
-                    itemBuilder: (context) => [
+                  child: PopupMenuWidget(
+                    menuSelect: _menuSelect,
+                    menuItems: [
                       PopupMenuItem(
                         value: 'duplicate',
                         child: Text('Duplicar', style: AppTextStyles.button),

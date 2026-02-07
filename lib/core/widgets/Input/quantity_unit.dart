@@ -3,6 +3,7 @@ import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
+import 'package:summa/core/widgets/Input/input_popup_menu.dart';
 
 class QuantityUnitField extends StatefulWidget {
   const QuantityUnitField({
@@ -14,6 +15,7 @@ class QuantityUnitField extends StatefulWidget {
     this.hintText,
     this.focusNode,
     this.onSubmitted,
+    this.offset,
   });
 
   final String? label;
@@ -23,6 +25,7 @@ class QuantityUnitField extends StatefulWidget {
   final String? hintText;
   final FocusNode? focusNode;
   final Function(String)? onSubmitted;
+  final Offset? offset;
 
   @override
   State<QuantityUnitField> createState() => _QuantityUnitFieldState();
@@ -53,7 +56,7 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
           const SizedBox(height: AppSpacing.xs),
         ],
         Container(
-          padding: const EdgeInsets.fromLTRB(12, 0, 8, 0),
+          padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
           decoration: BoxDecoration(
             color: AppColors.gray500,
             borderRadius: BorderRadius.circular(AppRadius.md),
@@ -91,19 +94,10 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
               ),
 
               // Unidade
-              DropdownButtonHideUnderline(
-                child: DropdownButton(
-                  value: widget.unit,
-                  icon: const Icon(Icons.keyboard_arrow_down),
-                  style: AppTextStyles.button,
-                  dropdownColor: AppColors.gray500,
-                  onChanged: (value) => widget.onUnitChanged(value!),
-                  items: const [
-                    DropdownMenuItem(value: 'un', child: Text('un')),
-                    DropdownMenuItem(value: 'kg', child: Text('kg')),
-                    DropdownMenuItem(value: 'g', child: Text('g')),
-                  ],
-                ),
+              InputPopupMenuWidget(
+                menuSelect: (value) => widget.onUnitChanged(value),
+                selectedValue: widget.unit,
+                offset: widget.offset,
               ),
             ],
           ),

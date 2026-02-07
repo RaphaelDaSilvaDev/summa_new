@@ -139,218 +139,222 @@ class _ItemPageState extends State<ItemPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 180,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 150,
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.sm,
-                    0,
-                    AppSpacing.lg,
-                    0,
-                  ),
-                  decoration: BoxDecoration(color: AppColors.gray900),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          context.pop();
-                        },
-                        icon: Icon(Icons.chevron_left_sharp),
-                      ),
-                      Flexible(
-                        child: FlatInputTextComponent(
-                          controller: _listNameController,
-                          isBig: true,
-                          focusNode: _listNameFocusNode,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: _showEditDate,
-                        child: TagComponent(
-                          text: _list?.formatDateDayMonth ?? "Adicionar data",
-                          color: AppColors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Positioned(
-                  top: 100,
-                  left: AppSpacing.lg,
-                  right: AppSpacing.lg,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: InputTextComponent(
-                          controller: _itemNameController,
-                          focusNode: _itemNameFocusNode,
-                          errorText: _itemNameError,
-                          onSubmitted: (_) {
-                            _quantityFocusNode.requestFocus();
-                          },
-                          label: 'Item',
-                          hintText: 'Nome do item',
-                        ),
-                      ),
-
-                      const SizedBox(width: 8),
-
-                      SizedBox(
-                        width: 114,
-                        child: QuantityUnitField(
-                          hintText: 'Qnt',
-                          quantityController: _quantityController,
-                          focusNode: _quantityFocusNode,
-                          onSubmitted: (_) {
-                            _createItem();
-                          },
-                          unit: _unitController,
-                          onUnitChanged: (value) {
-                            setState(() {
-                              _unitController = value;
-                            });
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(width: 8),
-
-                      CircularButtonComponnent(onPress: _createItem),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            child: InputTextComponent(
-              controller: _searchController,
-              hasClear: true,
-              label: "Pesquisar",
-              hintText: "Nome do item",
-              onChanged: (value) {
-                context.read<ShoppingItemViewmodel>().updateSearch(value);
-              },
-              onClear: () {
-                _searchController.clear();
-                context.read<ShoppingItemViewmodel>().updateSearch("");
-              },
-            ),
-          ),
-
-          Expanded(
-            child: Consumer<ShoppingItemViewmodel>(
-              builder: (context, viewModel, child) {
-                return StreamBuilder<List<ShoppingItem>>(
-                  stream: viewModel.baseStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: const CircularProgressIndicator(
-                          color: AppColors.gray100,
-                        ),
-                      );
-                    }
-
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-
-                    final listItems = snapshot.data ?? [];
-
-                    if (listItems.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'Nenhum item encontrado',
-                          style: AppTextStyles.body.copyWith(fontSize: 16),
-                        ),
-                      );
-                    }
-
-                    final totalInCents = listItems.fold(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 180,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 150,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.sm,
                       0,
-                      (sum, item) => sum + item.totalPriceInCents,
-                    );
-
-                    final filtered = viewModel.applyFilter(listItems);
-
-                    return Column(
+                      AppSpacing.lg,
+                      0,
+                    ),
+                    decoration: BoxDecoration(color: AppColors.gray900),
+                    child: Row(
                       children: [
-                        Expanded(
-                          child: filtered.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'Nenhum item encontrado para o filtro',
-                                    style: AppTextStyles.body.copyWith(
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                )
-                              : ListView.separated(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.lg,
-                                    vertical: AppSpacing.sm,
-                                  ),
-                                  separatorBuilder: (_, _) =>
-                                      SizedBox(height: 12),
-                                  itemCount: filtered.length,
-                                  itemBuilder: (context, index) {
-                                    final item = filtered[index];
-                                    return ItemCardComponent(
-                                      key: ValueKey(item.id),
-                                      item: item,
-                                      listId: widget.listId,
-                                    );
-                                  },
-                                ),
+                        IconButton(
+                          onPressed: () {
+                            context.pop();
+                          },
+                          icon: Icon(Icons.chevron_left_sharp),
                         ),
-                        Container(
-                          width: double.infinity,
-                          height: 90,
-                          decoration: BoxDecoration(color: AppColors.gray900),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.lg,
-                              vertical: AppSpacing.sm,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text('Total:', style: AppTextStyles.body),
-                                Text(
-                                  totalInCents.formatCurrencyBR(),
-                                  style: AppTextStyles.headline1.copyWith(
-                                    color: AppColors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
+                        Flexible(
+                          child: FlatInputTextComponent(
+                            controller: _listNameController,
+                            isBig: true,
+                            focusNode: _listNameFocusNode,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: _showEditDate,
+                          child: TagComponent(
+                            text: _list?.formatDateDayMonth ?? "Adicionar data",
+                            color: AppColors.green,
                           ),
                         ),
                       ],
-                    );
-                  },
-                );
-              },
+                    ),
+                  ),
+
+                  Positioned(
+                    top: 100,
+                    left: AppSpacing.lg,
+                    right: AppSpacing.lg,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: InputTextComponent(
+                            controller: _itemNameController,
+                            focusNode: _itemNameFocusNode,
+                            errorText: _itemNameError,
+                            onSubmitted: (_) {
+                              _quantityFocusNode.requestFocus();
+                            },
+                            label: 'Item',
+                            hintText: 'Nome do item',
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        SizedBox(
+                          width: 114,
+                          child: QuantityUnitField(
+                            hintText: 'Qnt',
+                            quantityController: _quantityController,
+                            focusNode: _quantityFocusNode,
+                            onSubmitted: (_) {
+                              _createItem();
+                            },
+                            unit: _unitController,
+                            onUnitChanged: (value) {
+                              setState(() {
+                                _unitController = value;
+                              });
+                            },
+                            offset: Offset(0, -8),
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        CircularButtonComponnent(onPress: _createItem),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
+              child: InputTextComponent(
+                controller: _searchController,
+                hasClear: true,
+                label: "Pesquisar",
+                hintText: "Nome do item",
+                onChanged: (value) {
+                  context.read<ShoppingItemViewmodel>().updateSearch(value);
+                },
+                onClear: () {
+                  _searchController.clear();
+                  context.read<ShoppingItemViewmodel>().updateSearch("");
+                },
+              ),
+            ),
+
+            Expanded(
+              child: Consumer<ShoppingItemViewmodel>(
+                builder: (context, viewModel, child) {
+                  return StreamBuilder<List<ShoppingItem>>(
+                    stream: viewModel.baseStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: const CircularProgressIndicator(
+                            color: AppColors.gray100,
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+
+                      final listItems = snapshot.data ?? [];
+
+                      if (listItems.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'Nenhum item encontrado',
+                            style: AppTextStyles.body.copyWith(fontSize: 16),
+                          ),
+                        );
+                      }
+
+                      final totalInCents = listItems.fold(
+                        0,
+                        (sum, item) => sum + item.totalPriceInCents,
+                      );
+
+                      final filtered = viewModel.applyFilter(listItems);
+
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: filtered.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      'Nenhum item encontrado para o filtro',
+                                      style: AppTextStyles.body.copyWith(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.lg,
+                                      vertical: AppSpacing.sm,
+                                    ),
+                                    separatorBuilder: (_, _) =>
+                                        SizedBox(height: 12),
+                                    itemCount: filtered.length,
+                                    itemBuilder: (context, index) {
+                                      final item = filtered[index];
+                                      return ItemCardComponent(
+                                        key: ValueKey(item.id),
+                                        item: item,
+                                        listId: widget.listId,
+                                      );
+                                    },
+                                  ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: 90,
+                            decoration: BoxDecoration(color: AppColors.gray900),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.lg,
+                                vertical: AppSpacing.sm,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text('Total:', style: AppTextStyles.body),
+                                  Text(
+                                    totalInCents.formatCurrencyBR(),
+                                    style: AppTextStyles.headline1.copyWith(
+                                      color: AppColors.green,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

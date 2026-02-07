@@ -12,6 +12,7 @@ import 'package:summa/core/widgets/Input/check_box.dart';
 import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
+import 'package:summa/core/widgets/popup_menu.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/features/items/shopping_item_viewmodel.dart';
 
@@ -119,6 +120,17 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _quantityFocusNode.dispose();
+    _valueController.dispose();
+    _valueFocusNode.dispose();
+    _nameItemController.dispose();
+    _nameItemFocusNode.dispose();
+    super.dispose();
+  }
+
   void _recalculateSubtotal() {
     final cents = _valueController.text.parseCurrencyBRToCents();
     final quantity = _quantityController.text.formatStringToQuanity();
@@ -192,101 +204,100 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.xs,
-        AppSpacing.md,
-        AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.gray400,
-        border: Border.all(width: 2, color: AppColors.gray300),
-        borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
-      ),
-      child: Column(
-        spacing: AppRadius.sm,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CheckboxComponent(value: widget.item.isDone, onTap: updateStatus),
-              SizedBox(width: 8),
-              Expanded(
-                child: FlatInputTextComponent(
-                  controller: _nameItemController,
-                  isBig: true,
-                  focusNode: _nameItemFocusNode,
+    return GestureDetector(
+      child: Container(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.xs,
+          AppSpacing.md,
+          AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.gray400,
+          border: Border.all(width: 2, color: AppColors.gray300),
+          borderRadius: BorderRadius.all(Radius.circular(AppRadius.md)),
+        ),
+        child: Column(
+          spacing: AppRadius.sm,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CheckboxComponent(
+                  value: widget.item.isDone,
+                  onTap: updateStatus,
                 ),
-              ),
-              SizedBox(
-                width: 24,
-                child: PopupMenuButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                SizedBox(width: 8),
+                Expanded(
+                  child: FlatInputTextComponent(
+                    controller: _nameItemController,
+                    isBig: true,
+                    focusNode: _nameItemFocusNode,
                   ),
-                  icon: Icon(Icons.more_vert, color: AppColors.gray100),
-                  color: AppColors.gray400,
-                  onSelected: (value) => _menuSelected(value),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'remove',
-                      child: Text("Remover", style: AppTextStyles.button),
+                ),
+                SizedBox(
+                  width: 24,
+                  child: PopupMenuWidget(
+                    menuSelect: _menuSelected,
+                    menuItems: [
+                      PopupMenuItem(
+                        value: 'remove',
+                        child: Text("Remover", style: AppTextStyles.button),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 114,
+                      child: QuantityUnitField(
+                        hintText: 'Qnt',
+                        quantityController: _quantityController,
+                        focusNode: _quantityFocusNode,
+                        unit: widget.item.unit,
+                        onUnitChanged: (value) => updateUnit(value),
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: 'Total: ',
+                        style: AppTextStyles.body,
+                        children: [
+                          TextSpan(
+                            text: _subTotalInCents.formatCurrencyBR(),
+                            style: AppTextStyles.headline2.copyWith(
+                              color: AppColors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 114,
+                      child: InputTextComponent(
+                        controller: _valueController,
+                        focusNode: _valueFocusNode,
+                        textInputType: TextInputType.number,
+                        onClear: () => _valueController.clear(),
+                        hintText: "R\$ 0,00",
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          CurrencyInputFormatter(),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: 114,
-                    child: QuantityUnitField(
-                      onUnitChanged: (value) => updateUnit(value),
-                      quantityController: _quantityController,
-                      focusNode: _quantityFocusNode,
-                      unit: widget.item.unit,
-                    ),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                      text: 'Total: ',
-                      style: AppTextStyles.body,
-                      children: [
-                        TextSpan(
-                          text: _subTotalInCents.formatCurrencyBR(),
-                          style: AppTextStyles.headline2.copyWith(
-                            color: AppColors.green,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 114,
-                    child: InputTextComponent(
-                      controller: _valueController,
-                      focusNode: _valueFocusNode,
-                      textInputType: TextInputType.number,
-                      onClear: () => _valueController.clear(),
-                      hintText: "R\$ 0,00",
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        CurrencyInputFormatter(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
