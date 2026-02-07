@@ -55,8 +55,8 @@ class _ListCardComponentState extends State<ListCardComponent> {
     super.dispose();
   }
 
-  void _goToItemPage({int? id}) {
-    context.push('/item/${id ?? widget.listWithItem.list.id}');
+  void _goToItemPage() {
+    context.push('/item/${widget.listWithItem.list.id}');
     _focusNode.unfocus();
   }
 
@@ -90,7 +90,7 @@ class _ListCardComponentState extends State<ListCardComponent> {
     }
   }
 
-  void _showCreateListDialog() async {
+  Future<int?> _showCreateListDialog() async {
     final result = await showDialog<(String, DateTime?)>(
       context: context,
       builder: (context) => CreateListDialog(
@@ -99,24 +99,28 @@ class _ListCardComponentState extends State<ListCardComponent> {
       ),
     );
 
-    if (result != null && mounted) {
-      final (listName, date) = result;
-      final id = await context
-          .read<ShoppingListViewmodel>()
-          .duplicateListWithItems(
-            name: listName,
-            date: date,
-            items: widget.listWithItem.items,
-          );
+    if (result == null || !mounted) return null;
 
-      _goToItemPage(id: id);
-    }
+    final (listName, date) = result;
+    final id = await context
+        .read<ShoppingListViewmodel>()
+        .duplicateListWithItems(
+          name: listName,
+          date: date,
+          items: widget.listWithItem.items,
+        );
+
+    return id;
   }
 
   void _menuSelect(String? selected) async {
     switch (selected) {
       case 'duplicate':
-        _showCreateListDialog();
+        final navigator = GoRouter.of(context);
+        final id = await _showCreateListDialog();
+        if (id != null) {
+          navigator.push('/item/$id');
+        }
         break;
       case 'remove':
         final confirm = await showDialog<bool>(
