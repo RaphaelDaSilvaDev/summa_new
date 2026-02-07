@@ -13,4 +13,6 @@ abstract class ShoppingListRepository {
   Future<ShoppingList?> getListById(int listId);
 
   Future<ShoppingListWithItems?> getListWithItems(int listId);
+
+  void refresh();
 }

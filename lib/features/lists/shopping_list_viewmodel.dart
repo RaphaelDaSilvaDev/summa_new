@@ -74,6 +74,8 @@ class ShoppingListViewmodel extends ChangeNotifier {
       await itemRepository.insert(newItem, newListId);
     }
 
+    repository.refresh();
+
     return newListId;
   }
 

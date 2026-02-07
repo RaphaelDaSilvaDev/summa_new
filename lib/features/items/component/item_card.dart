@@ -37,6 +37,7 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
   late FocusNode _valueFocusNode;
   late TextEditingController _nameItemController;
   late FocusNode _nameItemFocusNode;
+  bool _itemIsDone = false;
 
   late int _unitTotalInCents;
   late int _subTotalInCents;
@@ -47,6 +48,7 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
     _unitTotalInCents = widget.item.unitPrice ?? 0;
     _quantity = widget.item.quantity;
     _subTotalInCents = (_unitTotalInCents * _quantity).round();
+    _itemIsDone = widget.item.isDone;
 
     _quantityController = TextEditingController(
       text: _quantity.formatQuantity(),
@@ -148,9 +150,10 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
   }
 
   void updateStatus() {
+    _itemIsDone = !widget.item.isDone;
     context.read<ShoppingItemViewmodel>().update(
       itemId: widget.item.id,
-      isDone: !widget.item.isDone,
+      isDone: _itemIsDone,
     );
   }
 
@@ -222,7 +225,7 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CheckboxComponent(value: widget.item.isDone, onTap: updateStatus),
+              CheckboxComponent(value: _itemIsDone, onTap: updateStatus),
               SizedBox(width: 8),
               Expanded(
                 child: FlatInputTextComponent(

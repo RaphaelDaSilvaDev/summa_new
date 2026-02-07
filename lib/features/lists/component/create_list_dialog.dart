@@ -28,6 +28,8 @@ class _CreateListDialogState extends State<CreateListDialog> {
           ? '${widget.date?.day.toString().padLeft(2, "0")}/${widget.date?.month.toString().padLeft(2, "0")}/${widget.date?.year}'
           : "",
     );
+
+    lazyDate = widget.date;
     super.initState();
   }
 
