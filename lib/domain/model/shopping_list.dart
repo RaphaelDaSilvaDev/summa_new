@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 
 class ShoppingList {
@@ -20,13 +19,5 @@ class ShoppingList {
 
   int get totalPrice {
     return items.fold<int>(0, (sum, item) => sum + item.totalPriceInCents);
-  }
-
-  String get formatDateDayMonth {
-    if (plannedAt != null) {
-      return DateFormat('dd/MM').format(plannedAt!);
-    }
-
-    return "Adicionar data";
   }
 }

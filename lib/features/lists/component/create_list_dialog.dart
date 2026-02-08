@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:summa/core/extensions/date_extensions.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
 import 'package:summa/core/widgets/Input/date_picker.dart';
@@ -24,9 +25,7 @@ class _CreateListDialogState extends State<CreateListDialog> {
   void initState() {
     nameController = TextEditingController(text: widget.name ?? "");
     dateController = TextEditingController(
-      text: widget.date != null
-          ? '${widget.date?.day.toString().padLeft(2, "0")}/${widget.date?.month.toString().padLeft(2, "0")}/${widget.date?.year}'
-          : "",
+      text: widget.date != null ? widget.date?.formatDate() : "",
     );
 
     lazyDate = widget.date;
@@ -49,8 +48,7 @@ class _CreateListDialogState extends State<CreateListDialog> {
     if (pickedDate != null && mounted) {
       setState(() {
         lazyDate = pickedDate;
-        dateController.text =
-            '${pickedDate.day.toString().padLeft(2, "0")}/${pickedDate.month.toString().padLeft(2, "0")}/${pickedDate.year}';
+        dateController.text = pickedDate.formatDate();
       });
     }
   }

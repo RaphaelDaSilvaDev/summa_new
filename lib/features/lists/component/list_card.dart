@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/extensions/currency_extensions.dart';
+import 'package:summa/core/extensions/date_extensions.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -240,7 +241,9 @@ class _ListCardComponentState extends State<ListCardComponent> {
                 GestureDetector(
                   onTap: _showEditDate,
                   child: TagComponent(
-                    text: widget.listWithItem.list.formatDateDayMonth,
+                    text:
+                        widget.listWithItem.list.plannedAt?.formatDate() ??
+                        'Adicionar Data',
                     color: AppColors.green,
                   ),
                 ),

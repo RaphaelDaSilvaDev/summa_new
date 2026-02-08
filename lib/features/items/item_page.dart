@@ -6,6 +6,7 @@ import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reord
 import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/extensions/currency_extensions.dart';
+import 'package:summa/core/extensions/date_extensions.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
@@ -219,7 +220,9 @@ class _ItemPageState extends State<ItemPage> {
                         GestureDetector(
                           onTap: _showEditDate,
                           child: TagComponent(
-                            text: _list?.formatDateDayMonth ?? "Adicionar data",
+                            text:
+                                _list?.plannedAt?.formatDate() ??
+                                "Adicionar data",
                             color: AppColors.green,
                           ),
                         ),
