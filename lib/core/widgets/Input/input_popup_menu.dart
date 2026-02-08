@@ -40,7 +40,7 @@ class InputPopupMenuWidget extends StatelessWidget {
       itemBuilder: (context) => [
         PopupMenuItem(value: 'un', child: Text('un')),
         PopupMenuItem(value: 'kg', child: Text('kg')),
-        PopupMenuItem(value: 'g', child: Text('g')),
+        PopupMenuItem(value: 'l', child: Text('L')),
       ],
     );
   }

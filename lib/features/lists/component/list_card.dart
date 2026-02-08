@@ -211,18 +211,26 @@ class _ListCardComponentState extends State<ListCardComponent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: AppSpacing.lg,
               children: [
-                Row(
-                  children: [
-                    Text("Total: ", style: AppTextStyles.body),
-                    Text(
-                      widget.listWithItem.totalPrice.formatCurrencyBR(),
-                      style: AppTextStyles.headline1.copyWith(
-                        fontSize: 18,
-                        color: AppColors.green,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Text("Total: ", style: AppTextStyles.body),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            widget.listWithItem.totalPrice.formatCurrencyBR(),
+                            style: AppTextStyles.headline1.copyWith(
+                              fontSize: 18,
+                              color: AppColors.green,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TagComponent(
                   text:

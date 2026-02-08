@@ -7,15 +7,18 @@ class PopupMenuWidget extends StatelessWidget {
     super.key,
     required this.menuSelect,
     required this.menuItems,
+    this.onOpened,
   });
 
   final Function(String) menuSelect;
   final List<PopupMenuItem<String>> menuItems;
+  final Function()? onOpened;
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
       padding: EdgeInsets.zero,
+      onOpened: onOpened,
       constraints: const BoxConstraints(),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.sm),
