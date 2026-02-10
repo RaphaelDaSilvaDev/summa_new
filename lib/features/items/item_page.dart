@@ -15,9 +15,11 @@ import 'package:summa/core/widgets/Input/flat_input_text.dart';
 import 'package:summa/core/widgets/Input/input_autocomplete.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
+import 'package:summa/core/widgets/banner_ad.dart';
 import 'package:summa/core/widgets/circular_button.dart';
 import 'package:summa/core/widgets/tag_component.dart';
 import 'package:summa/data/dto/item_suggestion_dto.dart';
+import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/features/items/component/item_card.dart';
 import 'package:summa/features/items/shopping_item_viewmodel.dart';
@@ -343,6 +345,15 @@ class _ItemPageState extends State<ItemPage> {
                         (sum, item) => sum + item.totalPriceInCents,
                       );
 
+                      List<ListItem> listWithAds = [];
+
+                      for (int i = 0; i < listItems.length; i++) {
+                        if (i != 0 && i % 5 == 0) {
+                          listWithAds.add(AdPlaceholder('ad_$i'));
+                        }
+                        listWithAds.add(ItemData(listItems[i]));
+                      }
+
                       return Column(
                         children: [
                           Expanded(
@@ -362,11 +373,21 @@ class _ItemPageState extends State<ItemPage> {
                                       horizontal: AppSpacing.lg,
                                       vertical: AppSpacing.sm,
                                     ),
-                                    items: listItems,
+                                    items: listWithAds,
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
-                                    areItemsTheSame: (oldItem, newItem) =>
-                                        oldItem.id == newItem.id,
+                                    areItemsTheSame: (oldItem, newItem) {
+                                      if (oldItem is ItemData &&
+                                          newItem is ItemData) {
+                                        return oldItem.item.id ==
+                                            newItem.item.id;
+                                      }
+                                      if (oldItem is AdPlaceholder &&
+                                          newItem is AdPlaceholder) {
+                                        oldItem.id == newItem.id;
+                                      }
+                                      return false;
+                                    },
                                     itemBuilder:
                                         (context, animation, item, index) {
                                           return SizeFadeTransition(
@@ -377,11 +398,18 @@ class _ItemPageState extends State<ItemPage> {
                                               padding: const EdgeInsets.only(
                                                 bottom: 12,
                                               ),
-                                              child: ItemCardComponent(
-                                                key: ValueKey(item.id),
-                                                item: item,
-                                                listId: widget.listId,
-                                              ),
+                                              child: item is ItemData
+                                                  ? ItemCardComponent(
+                                                      key: ValueKey(
+                                                        item.item.id,
+                                                      ),
+                                                      item: item.item,
+                                                      listId: widget.listId,
+                                                    )
+                                                  : Center(
+                                                      child:
+                                                          const BannerAdWidget(),
+                                                    ),
                                             ),
                                           );
                                         },
@@ -422,4 +450,16 @@ class _ItemPageState extends State<ItemPage> {
       ),
     );
   }
+}
+
+abstract class ListItem {}
+
+class ItemData extends ListItem {
+  final ShoppingItem item;
+  ItemData(this.item);
+}
+
+class AdPlaceholder extends ListItem {
+  final String id;
+  AdPlaceholder(this.id);
 }

@@ -7,7 +7,9 @@ import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
+import 'package:summa/core/widgets/banner_ad.dart';
 import 'package:summa/core/widgets/circular_button.dart';
+import 'package:summa/domain/model/shopping_list_with_items.dart';
 import 'package:summa/features/lists/component/create_list_dialog.dart';
 import 'package:summa/features/lists/component/list_card.dart';
 import 'package:summa/features/lists/shopping_list_viewmodel.dart';
@@ -147,6 +149,15 @@ class _ListPageState extends State<ListPage> {
                         );
                       }
 
+                      List<ListShopping> listWithAds = [];
+
+                      for (int i = 0; i < lists.length; i++) {
+                        if (i != 0 && i % 3 == 0) {
+                          listWithAds.add(AdPlaceholder('ad_$i'));
+                        }
+                        listWithAds.add(ItemData(lists[i]));
+                      }
+
                       return Expanded(
                         child: _searchController.text.isEmpty && lists.isEmpty
                             ? Center(
@@ -162,9 +173,20 @@ class _ListPageState extends State<ListPage> {
                                   horizontal: AppSpacing.lg,
                                   vertical: AppSpacing.sm,
                                 ),
-                                items: lists,
-                                areItemsTheSame: (oldItem, newItem) =>
-                                    oldItem.list.id == newItem.list.id,
+                                items: listWithAds,
+                                areItemsTheSame: (oldItem, newItem) {
+                                  if (oldItem is ItemData &&
+                                      newItem is ItemData) {
+                                    return oldItem.list.list.id ==
+                                        newItem.list.list.id;
+                                  }
+
+                                  if (oldItem is AdPlaceholder &&
+                                      newItem is AdPlaceholder) {
+                                    return oldItem.id == newItem.id;
+                                  }
+                                  return false;
+                                },
                                 itemBuilder: (context, animation, item, index) {
                                   return SizeFadeTransition(
                                     sizeFraction: 0.5,
@@ -174,10 +196,14 @@ class _ListPageState extends State<ListPage> {
                                       padding: const EdgeInsets.only(
                                         bottom: 12,
                                       ),
-                                      child: ListCardComponent(
-                                        key: ValueKey(item.list.id),
-                                        listWithItem: item,
-                                      ),
+                                      child: item is ItemData
+                                          ? ListCardComponent(
+                                              key: ValueKey(item.list.list.id),
+                                              listWithItem: item.list,
+                                            )
+                                          : Center(
+                                              child: const BannerAdWidget(),
+                                            ),
                                     ),
                                   );
                                 },
@@ -193,4 +219,16 @@ class _ListPageState extends State<ListPage> {
       ),
     );
   }
+}
+
+abstract class ListShopping {}
+
+class ItemData extends ListShopping {
+  final ShoppingListWithItems list;
+  ItemData(this.list);
+}
+
+class AdPlaceholder extends ListShopping {
+  final String id;
+  AdPlaceholder(this.id);
 }
