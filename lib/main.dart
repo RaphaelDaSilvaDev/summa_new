@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/router/app_router.dart';
 import 'package:summa/core/theme/app_theme.dart';
@@ -9,7 +11,16 @@ import 'package:summa/domain/repositories/shopping_item_repository.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
 import 'package:summa/features/lists/shopping_list_viewmodel.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  await MobileAds.instance.initialize();
+
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint(details.toString());
+  };
+
   runApp(
     MultiProvider(
       providers: [

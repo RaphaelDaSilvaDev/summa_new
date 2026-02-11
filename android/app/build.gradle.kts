@@ -15,6 +15,16 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()){
+    localPropertiesFile.inputStream().use {
+        localProperties.load(it)
+    }
+}
+
+val admobAppId = localProperties.getProperty("admob.app.id") ?: ""
+
 android {
     namespace = "com.omna.summa"
     compileSdk = flutter.compileSdkVersion
@@ -35,6 +45,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders += mapOf("admobAppId" to admobAppId)
     }
 
     signingConfigs {
