@@ -11,6 +11,10 @@ class BannerAdWidget extends StatefulWidget {
 }
 
 class _BannerAdWidgetState extends State<BannerAdWidget> {
+  static const bool isTestMode = bool.fromEnvironment(
+    'IS_TEST',
+    defaultValue: false,
+  );
   late BannerAd _bannerAd;
   bool _isLoaded = false;
 
@@ -19,7 +23,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     super.initState();
 
     _bannerAd = BannerAd(
-      adUnitId: kReleaseMode
+      adUnitId: kReleaseMode && !isTestMode
           ? dotenv.get('BANNER_AD_UNIT_ID')
           : "ca-app-pub-3940256099942544/6300978111",
       size: AdSize.banner,
