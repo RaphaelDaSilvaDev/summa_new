@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reorderable_list_2.dart';
 import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 import 'package:provider/provider.dart';
@@ -186,17 +185,38 @@ class _ItemPageState extends State<ItemPage> {
     return GestureDetector(
       onTap: () => _removeAllFocus(context),
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.gray900,
+          title: Row(
+            children: [
+              Flexible(
+                child: FlatInputTextComponent(
+                  controller: _listNameController,
+                  isBig: true,
+                  focusNode: _listNameFocusNode,
+                ),
+              ),
+              GestureDetector(
+                onTap: _showEditDate,
+                child: TagComponent(
+                  text: _list?.plannedAt?.formatDate() ?? "Adicionar data",
+                  color: AppColors.green,
+                ),
+              ),
+            ],
+          ),
+        ),
         body: Column(
           children: [
             SizedBox(
               width: double.infinity,
-              height: 180,
+              height: 90,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 150,
+                    height: 60,
                     padding: const EdgeInsets.fromLTRB(
                       AppSpacing.sm,
                       0,
@@ -204,36 +224,11 @@ class _ItemPageState extends State<ItemPage> {
                       0,
                     ),
                     decoration: BoxDecoration(color: AppColors.gray900),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            context.pop();
-                          },
-                          icon: Icon(Icons.chevron_left_sharp),
-                        ),
-                        Flexible(
-                          child: FlatInputTextComponent(
-                            controller: _listNameController,
-                            isBig: true,
-                            focusNode: _listNameFocusNode,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _showEditDate,
-                          child: TagComponent(
-                            text:
-                                _list?.plannedAt?.formatDate() ??
-                                "Adicionar data",
-                            color: AppColors.green,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: null,
                   ),
 
                   Positioned(
-                    top: 100,
+                    top: 10,
                     left: AppSpacing.lg,
                     right: AppSpacing.lg,
                     child: Row(

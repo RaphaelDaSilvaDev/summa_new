@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -15,8 +16,9 @@ class DatabaseProvider {
 
     _db = await openDatabase(
       path,
-      version: 4,
+      version: 7,
       onCreate: exists ? null : _onCreate,
+      onUpgrade: _onUpgrade,
     );
 
     return _db!;
@@ -45,5 +47,20 @@ class DatabaseProvider {
         FOREIGN KEY (listId) REFERENCES shopping_lists(id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  static Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    debugPrint("SISTEMA: Migrando banco de $oldVersion para $newVersion");
+    if (oldVersion < 7) {
+      await db.execute('''
+      CREATE TABLE categories (id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL
+      )
+    ''');
+    }
   }
 }
