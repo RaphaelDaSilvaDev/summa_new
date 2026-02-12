@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reorderable_list_2.dart';
 import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 import 'package:provider/provider.dart';
+import 'package:summa/core/constants/app_icons.dart';
 import 'package:summa/core/theme/app_colors.dart';
+import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
+import 'package:summa/core/widgets/Input/input_popup_menu.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
+import 'package:summa/core/widgets/app_icon.dart';
 import 'package:summa/core/widgets/banner_ad.dart';
 import 'package:summa/core/widgets/circular_button.dart';
 import 'package:summa/domain/model/categories.dart';
@@ -24,6 +28,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
   late TextEditingController _categorieSearchController;
   late FocusNode _categorieFocusNode;
   String? _categorieNameError;
+  String _iconController = AppIcons.allKeys.first;
+  int _colorController = AppColors.blueDark.toARGB32();
 
   @override
   void initState() {
@@ -115,6 +121,68 @@ class _CategoriesPageState extends State<CategoriesPage> {
                             focusNode: _categorieFocusNode,
                             label: 'Categoria',
                             hintText: 'Nome da categoria',
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                          decoration: BoxDecoration(
+                            color: AppColors.gray500,
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            border: Border.all(
+                              color: AppColors.gray300,
+                              width: 2,
+                            ),
+                          ),
+                          child: InputPopupMenuWidget<String>(
+                            menuSelect: (value) => {
+                              setState(() {
+                                _iconController = value;
+                              }),
+                            },
+                            selectedValue: AppIcon(
+                              icon: AppIcons.icons[_iconController]!,
+                              size: 18,
+                            ),
+                            items: AppIcons.allKeys.map((key) {
+                              return PopupMenuItem(
+                                value: key,
+                                child: Center(
+                                  child: AppIcon(
+                                    icon: AppIcons.icons[key]!,
+                                    size: 18,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                          decoration: BoxDecoration(
+                            color: AppColors.gray500,
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            border: Border.all(
+                              color: AppColors.gray300,
+                              width: 2,
+                            ),
+                          ),
+                          child: InputPopupMenuWidget<int>(
+                            menuSelect: (value) => {
+                              setState(() {
+                                _colorController = value;
+                              }),
+                            },
+                            selectedValue: CircleAvatar(
+                              backgroundColor: Color(_colorController),
+                              maxRadius: 12,
+                            ),
+                            items: popupColors,
                           ),
                         ),
 
@@ -257,6 +325,56 @@ class _CategoriesPageState extends State<CategoriesPage> {
         ),
       ),
     );
+  }
+
+  List<PopupMenuItem<dynamic>> get popupColors {
+    return [
+      PopupMenuItem(
+        value: AppColors.blueDark.toARGB32(),
+        child: Center(
+          child: CircleAvatar(
+            backgroundColor: AppColors.blueDark,
+            maxRadius: 12,
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: AppColors.pinkDark.toARGB32(),
+        child: Center(
+          child: CircleAvatar(
+            backgroundColor: AppColors.pinkDark,
+            maxRadius: 12,
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: AppColors.orangeDark.toARGB32(),
+        child: Center(
+          child: CircleAvatar(
+            backgroundColor: AppColors.orangeDark,
+            maxRadius: 12,
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: AppColors.yellowDark.toARGB32(),
+        child: Center(
+          child: CircleAvatar(
+            backgroundColor: AppColors.yellowDark,
+            maxRadius: 12,
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: AppColors.greenDark.toARGB32(),
+        child: Center(
+          child: CircleAvatar(
+            backgroundColor: AppColors.greenDark,
+            maxRadius: 12,
+          ),
+        ),
+      ),
+    ];
   }
 }
 
