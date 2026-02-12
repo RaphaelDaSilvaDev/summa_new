@@ -8,4 +8,6 @@ abstract class CategoriesRepository {
   Future<void> delete(int id);
 
   Future<Categories?> getCategoryById(int id);
+
+  Future<void> update(Categories category);
 }

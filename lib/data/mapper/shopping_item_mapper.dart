@@ -9,6 +9,7 @@ class ShoppingItemMapper {
       unit: map['unit'],
       unitPrice: map['unitPrice'],
       isDone: map['isDone'] == 1,
+      categoryId: map['categoryId'],
     );
   }
 
@@ -21,6 +22,7 @@ class ShoppingItemMapper {
       'unit': item.unit,
       'unitPrice': item.unitPrice,
       'isDone': item.isDone ? 1 : 0,
+      'categoryId': item.categoryId,
     };
   }
 }

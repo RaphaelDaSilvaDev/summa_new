@@ -63,4 +63,18 @@ class CategoriesRepositoryImpl implements CategoriesRepository {
 
     return id;
   }
+
+  @override
+  Future<void> update(Categories category) async {
+    final db = await DatabaseProvider.database;
+
+    await db.update(
+      'categories',
+      CategoriesMapper.toMap(category),
+      where: 'id = ?',
+      whereArgs: [category.id],
+    );
+
+    await _emitLists();
+  }
 }

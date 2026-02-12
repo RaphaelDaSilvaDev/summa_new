@@ -5,6 +5,7 @@ class ShoppingItem {
   String unit;
   int? unitPrice;
   bool isDone;
+  final int? categoryId;
 
   ShoppingItem({
     this.id = 0,
@@ -13,6 +14,7 @@ class ShoppingItem {
     required this.unit,
     this.unitPrice,
     this.isDone = false,
+    this.categoryId,
   });
 
   int get totalPriceInCents {

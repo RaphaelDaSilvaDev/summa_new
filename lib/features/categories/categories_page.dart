@@ -3,6 +3,7 @@ import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reord
 import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/constants/app_icons.dart';
+import 'package:summa/core/constants/app_special_color.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -29,7 +30,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   late FocusNode _categorieFocusNode;
   String? _categorieNameError;
   String _iconController = AppIcons.allKeys.first;
-  int _colorController = AppColors.blueDark.toARGB32();
+  int _colorController = AppSpecialColor.all.first.toARGB32();
 
   @override
   void initState() {
@@ -56,7 +57,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
       });
 
       await context.read<CategoriesViewmodel>().createCategory(
-        _categorieController.text,
+        name: _categorieController.text,
+        color: _colorController,
+        icon: _iconController,
       );
 
       _categorieController.clear();
@@ -70,13 +73,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
       });
     }
   }
-
-  List<CategoryCard> cards = [
-    CategoryCard(category: Categories(name: "Padaria")),
-    CategoryCard(category: Categories(name: "Grãos")),
-    CategoryCard(category: Categories(name: "Teste")),
-    CategoryCard(category: Categories(name: "AHHHHH")),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +178,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
                               backgroundColor: Color(_colorController),
                               maxRadius: 12,
                             ),
-                            items: popupColors,
+                            items: AppSpecialColor.all.map((item) {
+                              return PopupMenuItem(
+                                value: item.toARGB32(),
+                                child: Center(
+                                  child: CircleAvatar(
+                                    backgroundColor: Color(item.toARGB32()),
+                                    maxRadius: 12,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
 
@@ -325,56 +331,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
         ),
       ),
     );
-  }
-
-  List<PopupMenuItem<dynamic>> get popupColors {
-    return [
-      PopupMenuItem(
-        value: AppColors.blueDark.toARGB32(),
-        child: Center(
-          child: CircleAvatar(
-            backgroundColor: AppColors.blueDark,
-            maxRadius: 12,
-          ),
-        ),
-      ),
-      PopupMenuItem(
-        value: AppColors.pinkDark.toARGB32(),
-        child: Center(
-          child: CircleAvatar(
-            backgroundColor: AppColors.pinkDark,
-            maxRadius: 12,
-          ),
-        ),
-      ),
-      PopupMenuItem(
-        value: AppColors.orangeDark.toARGB32(),
-        child: Center(
-          child: CircleAvatar(
-            backgroundColor: AppColors.orangeDark,
-            maxRadius: 12,
-          ),
-        ),
-      ),
-      PopupMenuItem(
-        value: AppColors.yellowDark.toARGB32(),
-        child: Center(
-          child: CircleAvatar(
-            backgroundColor: AppColors.yellowDark,
-            maxRadius: 12,
-          ),
-        ),
-      ),
-      PopupMenuItem(
-        value: AppColors.greenDark.toARGB32(),
-        child: Center(
-          child: CircleAvatar(
-            backgroundColor: AppColors.greenDark,
-            maxRadius: 12,
-          ),
-        ),
-      ),
-    ];
   }
 }
 

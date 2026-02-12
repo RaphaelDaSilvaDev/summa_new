@@ -39,12 +39,35 @@ class CategoriesViewmodel extends ChangeNotifier {
         .toList();
   }
 
-  Future<int> createCategory(String name) async {
-    return await repository.insert(Categories(name: name));
+  Future<int> createCategory({
+    required String name,
+    required int color,
+    required String icon,
+  }) async {
+    return await repository.insert(
+      Categories(name: name, color: color, icon: icon),
+    );
   }
 
   Future<void> remove(int id) async {
     await repository.delete(id);
+  }
+
+  Future<void> update({
+    required int id,
+    String? name,
+    String? icon,
+    int? color,
+  }) async {
+    Categories? category = await repository.getCategoryById(id);
+
+    if (category != null) {
+      category.name = name ?? category.name;
+      category.icon = icon ?? category.icon;
+      category.color = color ?? category.color;
+
+      await repository.update(category);
+    }
   }
 
   @override
