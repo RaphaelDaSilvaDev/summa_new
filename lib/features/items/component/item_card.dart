@@ -273,78 +273,72 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
 
                 SizedBox(width: 8),
 
-                SizedBox(
-                  height: 30,
-                  child: TagComponent(
-                    color: _selectedCategory != null
-                        ? Color(_selectedCategory!.color)
-                        : AppColors.purple,
-                    content: InputPopupMenuWidget<int>(
-                      menuSelect: (value) => {
-                        setState(() {
-                          _categoryController = value;
-                        }),
+                TagComponent(
+                  color: _selectedCategory != null
+                      ? Color(_selectedCategory!.color)
+                      : AppColors.purple,
+                  content: InputPopupMenuWidget<int>(
+                    menuSelect: (value) => {
+                      setState(() {
+                        _categoryController = value;
+                      }),
 
-                        updatedCategory(value),
-                      },
-                      selectedValue: _selectedCategory != null
-                          ? Row(
-                              spacing: 8,
-                              children: [
-                                AppIcon(
-                                  icon:
-                                      AppIcons.icons[_selectedCategory!.icon]!,
-                                  size: 18,
-                                ),
-                              ],
-                            )
-                          : Text("Categoria", style: AppTextStyles.button),
-                      items: [
-                        PopupMenuItem(
-                          value: 0,
+                      updatedCategory(value),
+                    },
+                    selectedValue: _selectedCategory != null
+                        ? Row(
+                            spacing: 8,
+                            children: [
+                              AppIcon(
+                                icon: AppIcons.icons[_selectedCategory!.icon]!,
+                                size: 18,
+                              ),
+                            ],
+                          )
+                        : Text("Categoria", style: AppTextStyles.button),
+                    items: [
+                      PopupMenuItem(
+                        value: 0,
+                        child: Center(
+                          child: SizedBox(
+                            width: 130,
+                            child: TagComponent(
+                              color: AppColors.purple,
+                              content: Row(
+                                spacing: 8,
+                                children: [
+                                  Icon(Icons.close_rounded, size: 18),
+                                  Text('Nenhuma'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      ...widget.categories.map((item) {
+                        return PopupMenuItem(
+                          value: item.id,
                           child: Center(
                             child: SizedBox(
                               width: 130,
-                              height: 30,
                               child: TagComponent(
-                                color: AppColors.purple,
+                                color: Color(item.color),
                                 content: Row(
                                   spacing: 8,
                                   children: [
-                                    Icon(Icons.close_rounded, size: 18),
-                                    Text('Nenhuma'),
+                                    AppIcon(
+                                      icon: AppIcons.icons[item.icon]!,
+                                      size: 18,
+                                    ),
+                                    Text(item.name),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        ...widget.categories.map((item) {
-                          return PopupMenuItem(
-                            value: item.id,
-                            child: Center(
-                              child: SizedBox(
-                                width: 130,
-                                height: 30,
-                                child: TagComponent(
-                                  color: Color(item.color),
-                                  content: Row(
-                                    spacing: 8,
-                                    children: [
-                                      AppIcon(
-                                        icon: AppIcons.icons[item.icon]!,
-                                        size: 18,
-                                      ),
-                                      Text(item.name),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
+                        );
+                      }),
+                    ],
                   ),
                 ),
 

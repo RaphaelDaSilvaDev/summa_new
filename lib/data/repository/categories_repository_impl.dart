@@ -1,12 +1,17 @@
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart';
 import 'package:summa/core/database/database_provider.dart';
 import 'package:summa/data/mapper/categories_mapper.dart';
 import 'package:summa/domain/model/categories.dart';
 import 'package:summa/domain/repositories/categories_repository.dart';
 
 class CategoriesRepositoryImpl implements CategoriesRepository {
-  final _controller = StreamController<List<Categories>>.broadcast();
+  CategoriesRepositoryImpl() {
+    _emitLists();
+  }
+
+  final _controller = BehaviorSubject<List<Categories>>();
 
   Future<void> _emitLists() async {
     final db = await DatabaseProvider.database;
@@ -24,7 +29,6 @@ class CategoriesRepositoryImpl implements CategoriesRepository {
 
   @override
   Stream<List<Categories>> getAll() {
-    _emitLists();
     return _controller.stream;
   }
 

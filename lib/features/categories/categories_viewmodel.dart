@@ -12,11 +12,12 @@ class CategoriesViewmodel extends ChangeNotifier {
   final CategoriesRepository repository;
 
   final _searchController = BehaviorSubject<String>.seeded('');
+  final _uiStateController = BehaviorSubject<CategoriesUiState>();
 
-  late final Stream<CategoriesUiState> uiState;
+  Stream<CategoriesUiState> get uiState => _uiStateController.stream;
 
   CategoriesViewmodel(this.repository) {
-    uiState = Rx.combineLatest2<List<Categories>, String, CategoriesUiState>(
+    Rx.combineLatest2<List<Categories>, String, CategoriesUiState>(
       repository.getAll(),
       _searchController.stream.startWith(''),
       (items, search) {
@@ -24,7 +25,7 @@ class CategoriesViewmodel extends ChangeNotifier {
 
         return CategoriesUiState(categories: filtered);
       },
-    ).shareValue();
+    ).pipe(_uiStateController);
   }
 
   void updateSearch(String value) {
@@ -73,6 +74,7 @@ class CategoriesViewmodel extends ChangeNotifier {
   @override
   void dispose() {
     _searchController.close();
+    _uiStateController.close();
     super.dispose();
   }
 }

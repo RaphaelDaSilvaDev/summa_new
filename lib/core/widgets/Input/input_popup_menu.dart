@@ -30,9 +30,7 @@ class InputPopupMenuWidget<T> extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         side: BorderSide(width: 2, color: AppColors.gray300),
       ),
-      icon: Row(
-        children: [selectedValue, const Icon(Icons.keyboard_arrow_down)],
-      ),
+      icon: Row(children: [selectedValue, Icon(Icons.keyboard_arrow_down)]),
       color: AppColors.gray500,
       onSelected: (value) => {menuSelect(value)},
       itemBuilder: (context) => items,

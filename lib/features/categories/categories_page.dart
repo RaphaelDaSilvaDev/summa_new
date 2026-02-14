@@ -38,6 +38,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
     _categorieController = TextEditingController();
     _categorieSearchController = TextEditingController();
     _categorieFocusNode = FocusNode();
+
+    _categorieFocusNode.requestFocus();
   }
 
   @override
@@ -46,7 +48,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
     _categorieSearchController.dispose();
     _categorieFocusNode.dispose();
 
-    _categorieFocusNode.requestFocus();
     super.dispose();
   }
 
@@ -63,6 +64,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
       );
 
       _categorieController.clear();
+      setState(() {
+        _iconController = AppIcons.allKeys.first;
+        _colorController = AppSpecialColor.all.first.toARGB32();
+      });
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _categorieFocusNode.requestFocus();
@@ -227,7 +232,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
               child: Consumer<CategoriesViewmodel>(
                 builder: (context, viewModel, child) {
                   return StreamBuilder<CategoriesUiState>(
-                    stream: context.read<CategoriesViewmodel>().uiState,
+                    stream: viewModel.uiState,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
