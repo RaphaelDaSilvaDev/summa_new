@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:summa/core/constants/app_units.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_spacing.dart';
@@ -94,10 +95,19 @@ class _QuantityUnitFieldState extends State<QuantityUnitField> {
               ),
 
               // Unidade
-              InputPopupMenuWidget(
+              InputPopupMenuWidget<String>(
                 menuSelect: (value) => widget.onUnitChanged(value),
-                selectedValue: widget.unit,
+                selectedValue: Text(
+                  widget.unit,
+                  style: AppTextStyles.button.copyWith(
+                    color: AppColors.gray100,
+                  ),
+                ),
+
                 offset: widget.offset,
+                items: AppUnits.all.map((item) {
+                  return PopupMenuItem(value: item, child: Text(item));
+                }).toList(),
               ),
             ],
           ),

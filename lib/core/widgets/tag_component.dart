@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:summa/core/theme/app_radius.dart';
-import 'package:summa/core/theme/app_text_styles.dart';
 
 class TagComponent extends StatelessWidget {
-  const TagComponent({super.key, required this.text, required this.color});
+  const TagComponent({super.key, required this.content, required this.color});
 
-  final String text;
+  final Widget content;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(12, 2, 12, 2),
+      height: 30,
+      padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.all(Radius.circular(AppRadius.lg)),
       ),
-      child: Text(text, style: AppTextStyles.button),
+      child: Center(child: content),
     );
   }
 }

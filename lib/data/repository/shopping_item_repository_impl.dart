@@ -90,13 +90,20 @@ class ShoppingItemRepositoryImpl implements ShoppingItemRepository {
   Future<List<ItemSuggestionDto>> getItemsLikeName(String name) async {
     final db = await DatabaseProvider.database;
 
-    final result = await db.query(
-      'shopping_items',
-      columns: ['name', 'unit'],
-      where: 'name LIKE ?',
-      whereArgs: ['%$name%'],
-      groupBy: 'name, unit',
-      limit: 10,
+    final result = await db.rawQuery(
+      '''
+      SELECT 
+        si.name,
+        si.unit,
+        si.categoryId,
+        c.icon
+      FROM shopping_items si
+      LEFT JOIN categories c ON c.id = si.categoryId
+      WHERE si.name LIKE ?
+      GROUP BY si.name, si.unit, si.categoryId
+      LIMIT 10
+      ''',
+      ['%$name%'],
     );
 
     return result
@@ -104,6 +111,8 @@ class ShoppingItemRepositoryImpl implements ShoppingItemRepository {
           (item) => ItemSuggestionDto(
             name: item['name'] as String,
             unit: item['unit'] as String,
+            categoryId: item['categoryId'] as int?,
+            icon: item['icon'] as String?,
           ),
         )
         .toList();

@@ -69,6 +69,44 @@ class _ListPageState extends State<ListPage> {
     return GestureDetector(
       onTap: () => _removeAllFocus(context),
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Todas as Listas'),
+          backgroundColor: AppColors.gray900,
+          scrolledUnderElevation: 0,
+        ),
+        drawer: Drawer(
+          backgroundColor: AppColors.gray900,
+          child: ListView(
+            padding: EdgeInsets.only(top: 60),
+            children: [
+              ListTile(
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.home_rounded, color: AppColors.gray100),
+                    SizedBox(width: 8),
+                    const Text("Home"),
+                  ],
+                ),
+                onTap: () {},
+              ),
+              ListTile(
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.sell_rounded, color: AppColors.gray100),
+                    SizedBox(width: 8),
+                    const Text("Categorias"),
+                  ],
+                ),
+                onTap: () {
+                  context.push('/categories');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
         floatingActionButton: CircularButtonComponnent(
           onPress: _showCreateListDialog,
         ),
@@ -76,28 +114,25 @@ class _ListPageState extends State<ListPage> {
           children: [
             SizedBox(
               width: double.infinity,
-              height: 180,
+              height: 90,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 150,
+                    height: 60,
                     padding: const EdgeInsets.fromLTRB(
                       AppSpacing.lg,
-                      60,
+                      0,
                       AppSpacing.lg,
                       0,
                     ),
                     decoration: BoxDecoration(color: AppColors.gray900),
-                    child: Text(
-                      'Todas as Listas',
-                      style: AppTextStyles.headline1,
-                    ),
+                    child: null,
                   ),
 
                   Positioned(
-                    top: 100,
+                    top: 10,
                     left: AppSpacing.lg,
                     right: AppSpacing.lg,
                     child: InputTextComponent(

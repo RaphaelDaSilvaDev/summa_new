@@ -5,10 +5,13 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:summa/core/router/app_router.dart';
 import 'package:summa/core/theme/app_theme.dart';
+import 'package:summa/data/repository/categories_repository_impl.dart';
 import 'package:summa/data/repository/shopping_item_repository_impl.dart';
 import 'package:summa/data/repository/shopping_list_repository_impl.dart';
+import 'package:summa/domain/repositories/categories_repository.dart';
 import 'package:summa/domain/repositories/shopping_item_repository.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
+import 'package:summa/features/categories/categories_viewmodel.dart';
 import 'package:summa/features/lists/shopping_list_viewmodel.dart';
 
 void main() async {
@@ -30,12 +33,20 @@ void main() async {
         Provider<ShoppingItemRepository>(
           create: (_) => ShoppingItemRepositoryImpl(),
         ),
+        Provider<CategoriesRepository>(
+          create: (_) => CategoriesRepositoryImpl(),
+        ),
 
         ChangeNotifierProvider(
           create: (context) => ShoppingListViewmodel(
             itemRepository: context.read<ShoppingItemRepository>(),
             context.read<ShoppingListRepository>(),
           ),
+        ),
+
+        ChangeNotifierProvider(
+          create: (context) =>
+              CategoriesViewmodel(context.read<CategoriesRepository>()),
         ),
       ],
       child: const SummaApp(),
