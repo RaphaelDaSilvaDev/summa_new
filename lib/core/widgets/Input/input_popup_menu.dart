@@ -22,7 +22,10 @@ class InputPopupMenuWidget<T> extends StatelessWidget {
       onOpened: () => FocusManager.instance.primaryFocus?.unfocus(),
       offset: offset ?? Offset(-8, -8),
       padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 10),
+      constraints: BoxConstraints(
+        minWidth: 10,
+        maxHeight: MediaQuery.of(context).size.height * 0.32,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
         side: BorderSide(width: 2, color: AppColors.gray300),

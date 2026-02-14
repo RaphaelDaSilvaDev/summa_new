@@ -5,7 +5,7 @@ class ShoppingItem {
   String unit;
   int? unitPrice;
   bool isDone;
-  final int? categoryId;
+  int? categoryId;
 
   ShoppingItem({
     this.id = 0,

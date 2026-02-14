@@ -12,7 +12,7 @@ class CategoriesMapper {
 
   static Map<String, dynamic> toMap(Categories category) {
     return {
-      'id': category.id,
+      'id': category.id == 0 ? null : category.id,
       'name': category.name,
       'color': category.color,
       'icon': category.icon,

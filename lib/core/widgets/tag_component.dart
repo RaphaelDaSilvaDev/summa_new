@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:summa/core/theme/app_radius.dart';
-import 'package:summa/core/theme/app_text_styles.dart';
 
 class TagComponent extends StatelessWidget {
-  const TagComponent({super.key, required this.text, required this.color});
+  const TagComponent({super.key, required this.content, required this.color});
 
-  final String text;
+  final Widget content;
   final Color color;
 
   @override
@@ -16,7 +15,7 @@ class TagComponent extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.all(Radius.circular(AppRadius.lg)),
       ),
-      child: Text(text, style: AppTextStyles.button),
+      child: content,
     );
   }
 }

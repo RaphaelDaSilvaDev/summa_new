@@ -72,6 +72,7 @@ class _ListPageState extends State<ListPage> {
         appBar: AppBar(
           title: const Text('Todas as Listas'),
           backgroundColor: AppColors.gray900,
+          scrolledUnderElevation: 0,
         ),
         drawer: Drawer(
           backgroundColor: AppColors.gray900,

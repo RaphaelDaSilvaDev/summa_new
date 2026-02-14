@@ -81,6 +81,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         appBar: AppBar(
           backgroundColor: AppColors.gray900,
           title: Text('Categorias'),
+          scrolledUnderElevation: 0,
         ),
         body: Column(
           children: [

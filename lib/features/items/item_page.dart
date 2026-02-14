@@ -18,6 +18,7 @@ import 'package:summa/core/widgets/banner_ad.dart';
 import 'package:summa/core/widgets/circular_button.dart';
 import 'package:summa/core/widgets/tag_component.dart';
 import 'package:summa/data/dto/item_suggestion_dto.dart';
+import 'package:summa/domain/model/categories.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/domain/model/shopping_list.dart';
 import 'package:summa/features/items/component/item_card.dart';
@@ -40,10 +41,12 @@ class _ItemPageState extends State<ItemPage> {
   late TextEditingController _searchController;
   late FocusNode _listNameFocusNode;
   late FocusNode _quantityFocusNode;
+  late List<Categories> categories = [];
   StreamSubscription<ShoppingItemsUiState>? _itemsSub;
   String? _itemNameError;
   FocusNode? _itemNameFocusNode;
   bool _listIsEmpty = false;
+  int? _categoryIdBySugestion;
 
   ShoppingList? _list;
   String _unitController = 'un';
@@ -57,6 +60,7 @@ class _ItemPageState extends State<ItemPage> {
         name: _itemNameController.text,
         quantity: double.tryParse(_quantityController.text) ?? 0.0,
         unit: _unitController,
+        categoryId: _categoryIdBySugestion,
       );
 
       _itemNameController.clear();
@@ -127,12 +131,24 @@ class _ItemPageState extends State<ItemPage> {
 
   void _onSelectSearchItem(ItemSuggestionDto item) {
     _itemNameController.text = item.name;
+    _categoryIdBySugestion = item.categoryId;
     setState(() {
       _unitController = item.unit;
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _quantityFocusNode.requestFocus();
+    });
+  }
+
+  Future<void> _loadCategories() async {
+    final data = await context
+        .read<ShoppingItemViewmodel>()
+        .categoriesStream
+        .first;
+
+    setState(() {
+      categories = data;
     });
   }
 
@@ -145,6 +161,7 @@ class _ItemPageState extends State<ItemPage> {
     _listNameFocusNode = FocusNode();
     _quantityFocusNode = FocusNode();
     _getList();
+    _loadCategories();
 
     _listNameFocusNode.addListener(() {
       if (!_listNameFocusNode.hasFocus) {
@@ -186,6 +203,7 @@ class _ItemPageState extends State<ItemPage> {
       onTap: () => _removeAllFocus(context),
       child: Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0,
           backgroundColor: AppColors.gray900,
           title: Row(
             children: [
@@ -199,7 +217,10 @@ class _ItemPageState extends State<ItemPage> {
               GestureDetector(
                 onTap: _showEditDate,
                 child: TagComponent(
-                  text: _list?.plannedAt?.formatDate() ?? "Adicionar data",
+                  content: Text(
+                    _list?.plannedAt?.formatDate() ?? "Adicionar data",
+                    style: AppTextStyles.button,
+                  ),
                   color: AppColors.green,
                 ),
               ),
@@ -400,6 +421,7 @@ class _ItemPageState extends State<ItemPage> {
                                                       ),
                                                       item: item.item,
                                                       listId: widget.listId,
+                                                      categories: categories,
                                                     )
                                                   : Center(
                                                       child:
