@@ -183,8 +183,9 @@ class _ListCardComponentState extends State<ListCardComponent> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
+                Flexible(
                   child: FlatInputTextComponent(
                     controller: _controller,
                     isBig: true,

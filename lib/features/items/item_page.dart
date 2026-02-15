@@ -206,6 +206,8 @@ class _ItemPageState extends State<ItemPage> {
           scrolledUnderElevation: 0,
           backgroundColor: AppColors.gray900,
           title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Flexible(
                 child: FlatInputTextComponent(

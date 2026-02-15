@@ -15,25 +15,37 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     'IS_TEST',
     defaultValue: false,
   );
-  late BannerAd _bannerAd;
+  BannerAd? _bannerAd;
+  late String _id;
   bool _isLoaded = false;
+  bool _isError = false;
 
   @override
   void initState() {
     super.initState();
 
+    _id = kReleaseMode && !isTestMode
+        ? dotenv.get('BANNER_AD_UNIT_ID')
+        : "ca-app-pub-3940256099942544/6300978111";
+
     _bannerAd = BannerAd(
-      adUnitId: kReleaseMode && !isTestMode
-          ? dotenv.get('BANNER_AD_UNIT_ID')
-          : "ca-app-pub-3940256099942544/6300978111",
+      adUnitId: _id,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (_) => setState(() {
-          _isLoaded = true;
-        }),
+        onAdLoaded: (_) {
+          if (!mounted) return;
+          setState(() {
+            _isLoaded = true;
+          });
+        },
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
+          if (!mounted) return;
+          setState(() {
+            _isError = true;
+          });
+          debugPrint('BannerAd error: ${error.toString()}');
         },
       ),
     )..load();
@@ -41,17 +53,18 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   void dispose() {
-    _bannerAd.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_isLoaded) return SizedBox(height: _bannerAd.size.height.toDouble());
+    if (_isError || !_isLoaded) return const SizedBox.shrink();
+
     return SizedBox(
-      height: _bannerAd.size.height.toDouble(),
-      width: _bannerAd.size.width.toDouble(),
-      child: AdWidget(ad: _bannerAd),
+      height: _bannerAd?.size.height.toDouble(),
+      width: _bannerAd?.size.width.toDouble(),
+      child: AdWidget(ad: _bannerAd!),
     );
   }
 }
