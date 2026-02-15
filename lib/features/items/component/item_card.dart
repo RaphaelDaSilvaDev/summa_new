@@ -260,102 +260,117 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CheckboxComponent(value: _itemIsDone, onTap: updateStatus),
-                SizedBox(width: 8),
                 Expanded(
-                  child: FlatInputTextComponent(
-                    controller: _nameItemController,
-                    isBig: true,
-                    focusNode: _nameItemFocusNode,
+                  child: Row(
+                    children: [
+                      CheckboxComponent(
+                        value: _itemIsDone,
+                        onTap: updateStatus,
+                      ),
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: FlatInputTextComponent(
+                          controller: _nameItemController,
+                          isBig: false,
+                          focusNode: _nameItemFocusNode,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                    ],
                   ),
                 ),
 
-                SizedBox(width: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TagComponent(
+                      color: _selectedCategory != null
+                          ? Color(_selectedCategory!.color)
+                          : AppColors.purple,
+                      content: InputPopupMenuWidget<int>(
+                        menuSelect: (value) => {
+                          setState(() {
+                            _categoryController = value;
+                          }),
 
-                TagComponent(
-                  color: _selectedCategory != null
-                      ? Color(_selectedCategory!.color)
-                      : AppColors.purple,
-                  content: InputPopupMenuWidget<int>(
-                    menuSelect: (value) => {
-                      setState(() {
-                        _categoryController = value;
-                      }),
-
-                      updatedCategory(value),
-                    },
-                    selectedValue: _selectedCategory != null
-                        ? Row(
-                            spacing: 8,
-                            children: [
-                              AppIcon(
-                                icon: AppIcons.icons[_selectedCategory!.icon]!,
-                                size: 18,
-                              ),
-                            ],
-                          )
-                        : Text("Categoria", style: AppTextStyles.button),
-                    items: [
-                      PopupMenuItem(
-                        value: 0,
-                        child: Center(
-                          child: SizedBox(
-                            width: 130,
-                            child: TagComponent(
-                              color: AppColors.purple,
-                              content: Row(
+                          updatedCategory(value),
+                        },
+                        selectedValue: _selectedCategory != null
+                            ? Row(
                                 spacing: 8,
                                 children: [
-                                  Icon(Icons.close_rounded, size: 18),
-                                  Text('Nenhuma'),
+                                  AppIcon(
+                                    icon: AppIcons
+                                        .icons[_selectedCategory!.icon]!,
+                                    size: 18,
+                                  ),
                                 ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      ...widget.categories.map((item) {
-                        return PopupMenuItem(
-                          value: item.id,
-                          child: Center(
-                            child: SizedBox(
-                              width: 130,
-                              child: TagComponent(
-                                color: Color(item.color),
-                                content: Row(
-                                  spacing: 8,
-                                  children: [
-                                    AppIcon(
-                                      icon: AppIcons.icons[item.icon]!,
-                                      size: 18,
-                                    ),
-                                    Text(item.name),
-                                  ],
+                              )
+                            : Text("Categoria", style: AppTextStyles.button),
+                        items: [
+                          PopupMenuItem(
+                            value: 0,
+                            child: Center(
+                              child: SizedBox(
+                                width: 130,
+                                child: TagComponent(
+                                  color: AppColors.purple,
+                                  content: Row(
+                                    spacing: 8,
+                                    children: [
+                                      Icon(Icons.close_rounded, size: 18),
+                                      Text('Nenhuma'),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
-
-                SizedBox(width: 8),
-
-                SizedBox(
-                  width: 24,
-                  child: PopupMenuWidget(
-                    menuSelect: _menuSelected,
-                    onOpened: () => _removeAllFocus(context),
-                    menuItems: [
-                      PopupMenuItem(
-                        value: 'remove',
-                        child: Text("Remover", style: AppTextStyles.button),
+                          ...widget.categories.map((item) {
+                            return PopupMenuItem(
+                              value: item.id,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 130,
+                                  child: TagComponent(
+                                    color: Color(item.color),
+                                    content: Row(
+                                      spacing: 8,
+                                      children: [
+                                        AppIcon(
+                                          icon: AppIcons.icons[item.icon]!,
+                                          size: 18,
+                                        ),
+                                        Text(item.name),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+
+                    SizedBox(width: 8),
+
+                    SizedBox(
+                      width: 24,
+                      child: PopupMenuWidget(
+                        menuSelect: _menuSelected,
+                        onOpened: () => _removeAllFocus(context),
+                        menuItems: [
+                          PopupMenuItem(
+                            value: 'remove',
+                            child: Text("Remover", style: AppTextStyles.button),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

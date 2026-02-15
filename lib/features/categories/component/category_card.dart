@@ -172,10 +172,12 @@ class _CategoryCardState extends State<CategoryCard> {
           Expanded(
             child: FlatInputTextComponent(
               controller: _nameCategoryController,
-              isBig: true,
+              isBig: false,
               focusNode: _nameCategoryFocusNode,
             ),
           ),
+
+          SizedBox(width: 8),
 
           Container(
             padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
