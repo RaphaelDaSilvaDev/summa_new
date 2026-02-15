@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:summa/core/constants/app_icons.dart';
 import 'package:summa/core/extensions/currency_extensions.dart';
 import 'package:summa/core/extensions/quantity_exteinsions.dart';
 import 'package:summa/core/input_formatters/currency_input_formatter.dart';
@@ -10,9 +11,13 @@ import 'package:summa/core/theme/app_spacing.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
 import 'package:summa/core/widgets/Input/check_box.dart';
 import 'package:summa/core/widgets/Input/flat_input_text.dart';
+import 'package:summa/core/widgets/Input/input_popup_menu.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
 import 'package:summa/core/widgets/Input/quantity_unit.dart';
+import 'package:summa/core/widgets/app_icon.dart';
 import 'package:summa/core/widgets/popup_menu.dart';
+import 'package:summa/core/widgets/tag_component.dart';
+import 'package:summa/domain/model/categories.dart';
 import 'package:summa/domain/model/shopping_item.dart';
 import 'package:summa/features/items/shopping_item_viewmodel.dart';
 
@@ -21,9 +26,11 @@ class ItemCardComponent extends StatefulWidget {
     super.key,
     required this.item,
     required this.listId,
+    required this.categories,
   });
 
   final ShoppingItem item;
+  final List<Categories> categories;
   final int listId;
 
   @override
@@ -37,11 +44,13 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
   late FocusNode _valueFocusNode;
   late TextEditingController _nameItemController;
   late FocusNode _nameItemFocusNode;
+  late int? _categoryController;
   bool _itemIsDone = false;
 
   late int _unitTotalInCents;
   late int _subTotalInCents;
   late double _quantity;
+  late Categories? _selectedCategory;
 
   @override
   void initState() {
@@ -49,6 +58,8 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
     _quantity = widget.item.quantity;
     _subTotalInCents = (_unitTotalInCents * _quantity).round();
     _itemIsDone = widget.item.isDone;
+    _categoryController = widget.item.categoryId;
+    _getSelectedCategory();
 
     _quantityController = TextEditingController(
       text: _quantity.formatQuantity(),
@@ -164,6 +175,14 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
     );
   }
 
+  void updatedCategory(int categoryId) {
+    context.read<ShoppingItemViewmodel>().update(
+      itemId: widget.item.id,
+      category: categoryId,
+    );
+    _getSelectedCategory();
+  }
+
   void _menuSelected(String? selected) async {
     switch (selected) {
       case 'remove':
@@ -213,6 +232,13 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
     });
   }
 
+  void _getSelectedCategory() {
+    _selectedCategory = widget.categories
+        .where((category) => category.id == _categoryController)
+        .cast<Categories?>()
+        .firstOrNull;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -234,28 +260,117 @@ class _ItemCardComponentState extends State<ItemCardComponent> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CheckboxComponent(value: _itemIsDone, onTap: updateStatus),
-                SizedBox(width: 8),
                 Expanded(
-                  child: FlatInputTextComponent(
-                    controller: _nameItemController,
-                    isBig: true,
-                    focusNode: _nameItemFocusNode,
-                  ),
-                ),
-                SizedBox(
-                  width: 24,
-                  child: PopupMenuWidget(
-                    menuSelect: _menuSelected,
-                    onOpened: () => _removeAllFocus(context),
-                    menuItems: [
-                      PopupMenuItem(
-                        value: 'remove',
-                        child: Text("Remover", style: AppTextStyles.button),
+                  child: Row(
+                    children: [
+                      CheckboxComponent(
+                        value: _itemIsDone,
+                        onTap: updateStatus,
                       ),
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: FlatInputTextComponent(
+                          controller: _nameItemController,
+                          isBig: false,
+                          focusNode: _nameItemFocusNode,
+                        ),
+                      ),
+                      SizedBox(width: 8),
                     ],
                   ),
+                ),
+
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TagComponent(
+                      color: _selectedCategory != null
+                          ? Color(_selectedCategory!.color)
+                          : AppColors.purple,
+                      content: InputPopupMenuWidget<int>(
+                        menuSelect: (value) => {
+                          setState(() {
+                            _categoryController = value;
+                          }),
+
+                          updatedCategory(value),
+                        },
+                        selectedValue: _selectedCategory != null
+                            ? Row(
+                                spacing: 8,
+                                children: [
+                                  AppIcon(
+                                    icon: AppIcons
+                                        .icons[_selectedCategory!.icon]!,
+                                    size: 18,
+                                  ),
+                                ],
+                              )
+                            : Text("Categoria", style: AppTextStyles.button),
+                        items: [
+                          PopupMenuItem(
+                            value: 0,
+                            child: Center(
+                              child: SizedBox(
+                                width: 130,
+                                child: TagComponent(
+                                  color: AppColors.purple,
+                                  content: Row(
+                                    spacing: 8,
+                                    children: [
+                                      Icon(Icons.close_rounded, size: 18),
+                                      Text('Nenhuma'),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          ...widget.categories.map((item) {
+                            return PopupMenuItem(
+                              value: item.id,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 130,
+                                  child: TagComponent(
+                                    color: Color(item.color),
+                                    content: Row(
+                                      spacing: 8,
+                                      children: [
+                                        AppIcon(
+                                          icon: AppIcons.icons[item.icon]!,
+                                          size: 18,
+                                        ),
+                                        Text(item.name),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(width: 8),
+
+                    SizedBox(
+                      width: 24,
+                      child: PopupMenuWidget(
+                        menuSelect: _menuSelected,
+                        onOpened: () => _removeAllFocus(context),
+                        menuItems: [
+                          PopupMenuItem(
+                            value: 'remove',
+                            child: Text("Remover", style: AppTextStyles.button),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

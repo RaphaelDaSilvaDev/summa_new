@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:summa/data/dto/item_suggestion_dto.dart';
 import 'package:summa/data/repository/shopping_list_repository_impl.dart';
+import 'package:summa/domain/model/categories.dart';
 import 'package:summa/domain/model/shopping_item.dart';
+import 'package:summa/domain/repositories/categories_repository.dart';
 import 'package:summa/domain/repositories/shopping_item_repository.dart';
 import 'package:summa/domain/repositories/shopping_list_repository.dart';
 
@@ -18,6 +20,7 @@ class ShoppingItemsUiState {
 class ShoppingItemViewmodel extends ChangeNotifier {
   final ShoppingItemRepository repository;
   final ShoppingListRepository listRepository;
+  final CategoriesRepository categoriesRepository;
   final int listId;
 
   final _searchController = BehaviorSubject<String>.seeded('');
@@ -25,7 +28,15 @@ class ShoppingItemViewmodel extends ChangeNotifier {
 
   late final Stream<ShoppingItemsUiState> uiState;
 
-  ShoppingItemViewmodel(this.repository, this.listRepository, this.listId) {
+  Stream<List<Categories>> get categoriesStream =>
+      categoriesRepository.getAll();
+
+  ShoppingItemViewmodel({
+    required this.repository,
+    required this.listRepository,
+    required this.categoriesRepository,
+    required this.listId,
+  }) {
     uiState =
         Rx.combineLatest2<List<ShoppingItem>, String, ShoppingItemsUiState>(
           repository.getAllByList(listId),
@@ -59,10 +70,16 @@ class ShoppingItemViewmodel extends ChangeNotifier {
     required String name,
     required String unit,
     required double quantity,
+    int? categoryId,
     int? newListId,
   }) async {
     await repository.insert(
-      ShoppingItem(name: name, unit: unit, quantity: quantity),
+      ShoppingItem(
+        name: name,
+        unit: unit,
+        quantity: quantity,
+        categoryId: categoryId,
+      ),
       newListId ?? listId,
     );
 
@@ -80,6 +97,7 @@ class ShoppingItemViewmodel extends ChangeNotifier {
     String? unit,
     int? unitPrice,
     bool? isDone,
+    int? category,
   }) async {
     ShoppingItem? item = await repository.getItemById(itemId);
 
@@ -89,6 +107,7 @@ class ShoppingItemViewmodel extends ChangeNotifier {
       item.unit = unit ?? item.unit;
       item.unitPrice = unitPrice ?? item.unitPrice;
       item.isDone = isDone ?? item.isDone;
+      item.categoryId = category ?? item.categoryId;
 
       await repository.update(item, listId);
 

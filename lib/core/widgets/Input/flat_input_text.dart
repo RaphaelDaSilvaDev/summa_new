@@ -17,18 +17,20 @@ class FlatInputTextComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: TextField(
-        controller: controller,
-        autofocus: autoFocus,
-        focusNode: focusNode,
-        style: isBig ? AppTextStyles.headline1 : AppTextStyles.button,
-        decoration: InputDecoration(
-          isDense: true,
-          contentPadding: EdgeInsets.zero,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
+    return IntrinsicWidth(
+      child: Container(
+        constraints: BoxConstraints(minWidth: 48),
+        child: TextField(
+          controller: controller,
+          autofocus: autoFocus,
+          focusNode: focusNode,
+          style: isBig ? AppTextStyles.headline1 : AppTextStyles.button,
+          decoration: InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+          ),
         ),
       ),
     );

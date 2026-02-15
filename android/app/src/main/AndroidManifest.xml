@@ -1,6 +1,6 @@
 <manifest package="com.omna.summa" xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="summa"
+        android:label="Summa"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <meta-data

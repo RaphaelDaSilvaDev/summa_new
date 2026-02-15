@@ -183,8 +183,9 @@ class _ListCardComponentState extends State<ListCardComponent> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
+                Flexible(
                   child: FlatInputTextComponent(
                     controller: _controller,
                     isBig: true,
@@ -234,16 +235,20 @@ class _ListCardComponentState extends State<ListCardComponent> {
                   ),
                 ),
                 TagComponent(
-                  text:
-                      "${widget.listWithItem.totalIsDone}/${widget.listWithItem.items.length}",
+                  content: Text(
+                    "${widget.listWithItem.totalIsDone}/${widget.listWithItem.items.length}",
+                    style: AppTextStyles.button,
+                  ),
                   color: AppColors.blue,
                 ),
                 GestureDetector(
                   onTap: _showEditDate,
                   child: TagComponent(
-                    text:
-                        widget.listWithItem.list.plannedAt?.formatDate() ??
-                        'Adicionar Data',
+                    content: Text(
+                      widget.listWithItem.list.plannedAt?.formatDate() ??
+                          'Adicionar Data',
+                      style: AppTextStyles.button,
+                    ),
                     color: AppColors.green,
                   ),
                 ),

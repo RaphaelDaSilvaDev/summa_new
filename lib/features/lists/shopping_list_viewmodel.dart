@@ -70,6 +70,7 @@ class ShoppingListViewmodel extends ChangeNotifier {
         name: item.name,
         unit: item.unit,
         quantity: item.quantity,
+        categoryId: item.categoryId,
       );
       await itemRepository.insert(newItem, newListId);
     }

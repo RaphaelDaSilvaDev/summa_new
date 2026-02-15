@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:summa/core/constants/app_icons.dart';
 import 'package:summa/core/theme/app_colors.dart';
 import 'package:summa/core/theme/app_radius.dart';
 import 'package:summa/core/theme/app_text_styles.dart';
 import 'package:summa/core/widgets/Input/input_text.dart';
+import 'package:summa/core/widgets/app_icon.dart';
 import 'package:summa/data/dto/item_suggestion_dto.dart';
 
 class InputAutocomplete extends StatefulWidget {
@@ -68,12 +70,20 @@ class _InputAutocompleteState extends State<InputAutocomplete> {
                     vertical: 16,
                     horizontal: 12,
                   ),
-                  child: Text(
-                    '${option.name} (${option.unit})',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.gray100,
-                      fontSize: 14,
-                    ),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      Text(
+                        '${option.name} (${option.unit})',
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.gray100,
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (option.icon != null &&
+                          AppIcons.icons[option.icon] != null)
+                        AppIcon(icon: AppIcons.icons[option.icon]!, size: 16),
+                    ],
                   ),
                 ),
               );
